@@ -1,0 +1,385 @@
+2026-02-27 17:20:51,073 [INFERENCE] =======================================================
+2026-02-27 17:20:51,073 [INFERENCE]   INFERENCE ENGINE arrancado
+2026-02-27 17:20:51,073 [INFERENCE]   Intervalo: 60s
+2026-02-27 17:20:51,073 [INFERENCE]   Threshold bueno: 65%
+2026-02-27 17:20:51,073 [INFERENCE] =======================================================
+2026-02-27 17:20:51,074 [INFERENCE] Cargando modelo desde models\model.xgb.json...
+2026-02-27 17:20:51,090 [INFERENCE] Modelo XGBoost cargado: models\model.xgb.json
+2026-02-27 17:20:51,102 [INFERENCE] ✅ Modelo recargado
+2026-02-27 17:22:48,495 [INFERENCE] =======================================================
+2026-02-27 17:22:48,495 [INFERENCE]   INFERENCE ENGINE arrancado
+2026-02-27 17:22:48,495 [INFERENCE]   Intervalo: 60s
+2026-02-27 17:22:48,495 [INFERENCE]   Threshold bueno: 65%
+2026-02-27 17:22:48,495 [INFERENCE] =======================================================
+2026-02-27 17:22:48,496 [INFERENCE] Cargando modelo desde models\model_native.onnx...
+2026-02-27 17:22:48,569 [INFERENCE] Error en loop: [ONNXRuntimeError] : 7 : INVALID_PROTOBUF : Load model from models\model_native.onnx failed:Protobuf parsing failed.
+Traceback (most recent call last):
+  File "C:\Repos\Plymarket\inference.py", line 296, in run_inference_loop
+    reloaded = loader.load_or_reload()
+  File "C:\Repos\Plymarket\inference.py", line 164, in load_or_reload
+    self._load_onnx(model_path)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Repos\Plymarket\inference.py", line 127, in _load_onnx
+    self._ort_session = ort.InferenceSession(path)
+                        ~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Repos\Plymarket\.venv\Lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py", line 504, in __init__
+    self._create_inference_session(providers, provider_options, disabled_optimizers)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Repos\Plymarket\.venv\Lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py", line 599, in _create_inference_session
+    sess = C.InferenceSession(session_options, self._model_path, True, self._read_config_from_model)
+onnxruntime.capi.onnxruntime_pybind11_state.InvalidProtobuf: [ONNXRuntimeError] : 7 : INVALID_PROTOBUF : Load model from models\model_native.onnx failed:Protobuf parsing failed.
+2026-02-27 17:28:59,865 [INFERENCE] =======================================================
+2026-02-27 17:28:59,865 [INFERENCE]   INFERENCE ENGINE arrancado
+2026-02-27 17:28:59,865 [INFERENCE]   Intervalo: 60s
+2026-02-27 17:28:59,865 [INFERENCE]   Threshold bueno: 65%
+2026-02-27 17:28:59,865 [INFERENCE] =======================================================
+2026-02-27 17:28:59,866 [INFERENCE] Cargando modelo desde models\model_native.onnx...
+2026-02-27 17:28:59,878 [INFERENCE] Error en loop: [ONNXRuntimeError] : 7 : INVALID_PROTOBUF : Load model from models\model_native.onnx failed:Protobuf parsing failed.
+Traceback (most recent call last):
+  File "C:\Repos\Plymarket\inference.py", line 296, in run_inference_loop
+    reloaded = loader.load_or_reload()
+  File "C:\Repos\Plymarket\inference.py", line 164, in load_or_reload
+    self._load_onnx(model_path)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Repos\Plymarket\inference.py", line 127, in _load_onnx
+    self._ort_session = ort.InferenceSession(path)
+                        ~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Repos\Plymarket\.venv\Lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py", line 504, in __init__
+    self._create_inference_session(providers, provider_options, disabled_optimizers)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Repos\Plymarket\.venv\Lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py", line 599, in _create_inference_session
+    sess = C.InferenceSession(session_options, self._model_path, True, self._read_config_from_model)
+onnxruntime.capi.onnxruntime_pybind11_state.InvalidProtobuf: [ONNXRuntimeError] : 7 : INVALID_PROTOBUF : Load model from models\model_native.onnx failed:Protobuf parsing failed.
+2026-02-27 17:29:59,880 [INFERENCE] Cargando modelo desde models\model_native.onnx...
+2026-02-27 17:29:59,883 [INFERENCE] Error en loop: [ONNXRuntimeError] : 7 : INVALID_PROTOBUF : Load model from models\model_native.onnx failed:Protobuf parsing failed.
+Traceback (most recent call last):
+  File "C:\Repos\Plymarket\inference.py", line 296, in run_inference_loop
+    reloaded = loader.load_or_reload()
+  File "C:\Repos\Plymarket\inference.py", line 164, in load_or_reload
+    self._load_onnx(model_path)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Repos\Plymarket\inference.py", line 127, in _load_onnx
+    self._ort_session = ort.InferenceSession(path)
+                        ~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Repos\Plymarket\.venv\Lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py", line 504, in __init__
+    self._create_inference_session(providers, provider_options, disabled_optimizers)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Repos\Plymarket\.venv\Lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py", line 599, in _create_inference_session
+    sess = C.InferenceSession(session_options, self._model_path, True, self._read_config_from_model)
+onnxruntime.capi.onnxruntime_pybind11_state.InvalidProtobuf: [ONNXRuntimeError] : 7 : INVALID_PROTOBUF : Load model from models\model_native.onnx failed:Protobuf parsing failed.
+2026-02-27 17:30:59,885 [INFERENCE] Cargando modelo desde models\model_native.onnx...
+2026-02-27 17:30:59,887 [INFERENCE] Error en loop: [ONNXRuntimeError] : 7 : INVALID_PROTOBUF : Load model from models\model_native.onnx failed:Protobuf parsing failed.
+Traceback (most recent call last):
+  File "C:\Repos\Plymarket\inference.py", line 296, in run_inference_loop
+    reloaded = loader.load_or_reload()
+  File "C:\Repos\Plymarket\inference.py", line 164, in load_or_reload
+    self._load_onnx(model_path)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Repos\Plymarket\inference.py", line 127, in _load_onnx
+    self._ort_session = ort.InferenceSession(path)
+                        ~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Repos\Plymarket\.venv\Lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py", line 504, in __init__
+    self._create_inference_session(providers, provider_options, disabled_optimizers)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Repos\Plymarket\.venv\Lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py", line 599, in _create_inference_session
+    sess = C.InferenceSession(session_options, self._model_path, True, self._read_config_from_model)
+onnxruntime.capi.onnxruntime_pybind11_state.InvalidProtobuf: [ONNXRuntimeError] : 7 : INVALID_PROTOBUF : Load model from models\model_native.onnx failed:Protobuf parsing failed.
+2026-02-27 17:31:59,888 [INFERENCE] Cargando modelo desde models\model_native.onnx...
+2026-02-27 17:31:59,891 [INFERENCE] Error en loop: [ONNXRuntimeError] : 7 : INVALID_PROTOBUF : Load model from models\model_native.onnx failed:Protobuf parsing failed.
+Traceback (most recent call last):
+  File "C:\Repos\Plymarket\inference.py", line 296, in run_inference_loop
+    reloaded = loader.load_or_reload()
+  File "C:\Repos\Plymarket\inference.py", line 164, in load_or_reload
+    self._load_onnx(model_path)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Repos\Plymarket\inference.py", line 127, in _load_onnx
+    self._ort_session = ort.InferenceSession(path)
+                        ~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Repos\Plymarket\.venv\Lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py", line 504, in __init__
+    self._create_inference_session(providers, provider_options, disabled_optimizers)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Repos\Plymarket\.venv\Lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py", line 599, in _create_inference_session
+    sess = C.InferenceSession(session_options, self._model_path, True, self._read_config_from_model)
+onnxruntime.capi.onnxruntime_pybind11_state.InvalidProtobuf: [ONNXRuntimeError] : 7 : INVALID_PROTOBUF : Load model from models\model_native.onnx failed:Protobuf parsing failed.
+2026-02-27 17:32:59,892 [INFERENCE] Cargando modelo desde models\model_native.onnx...
+2026-02-27 17:32:59,895 [INFERENCE] Error en loop: [ONNXRuntimeError] : 7 : INVALID_PROTOBUF : Load model from models\model_native.onnx failed:Protobuf parsing failed.
+Traceback (most recent call last):
+  File "C:\Repos\Plymarket\inference.py", line 296, in run_inference_loop
+    reloaded = loader.load_or_reload()
+  File "C:\Repos\Plymarket\inference.py", line 164, in load_or_reload
+    self._load_onnx(model_path)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Repos\Plymarket\inference.py", line 127, in _load_onnx
+    self._ort_session = ort.InferenceSession(path)
+                        ~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Repos\Plymarket\.venv\Lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py", line 504, in __init__
+    self._create_inference_session(providers, provider_options, disabled_optimizers)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Repos\Plymarket\.venv\Lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py", line 599, in _create_inference_session
+    sess = C.InferenceSession(session_options, self._model_path, True, self._read_config_from_model)
+onnxruntime.capi.onnxruntime_pybind11_state.InvalidProtobuf: [ONNXRuntimeError] : 7 : INVALID_PROTOBUF : Load model from models\model_native.onnx failed:Protobuf parsing failed.
+2026-02-27 17:33:59,896 [INFERENCE] Cargando modelo desde models\model_native.onnx...
+2026-02-27 17:33:59,898 [INFERENCE] Error en loop: [ONNXRuntimeError] : 7 : INVALID_PROTOBUF : Load model from models\model_native.onnx failed:Protobuf parsing failed.
+Traceback (most recent call last):
+  File "C:\Repos\Plymarket\inference.py", line 296, in run_inference_loop
+    reloaded = loader.load_or_reload()
+  File "C:\Repos\Plymarket\inference.py", line 164, in load_or_reload
+    self._load_onnx(model_path)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Repos\Plymarket\inference.py", line 127, in _load_onnx
+    self._ort_session = ort.InferenceSession(path)
+                        ~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Repos\Plymarket\.venv\Lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py", line 504, in __init__
+    self._create_inference_session(providers, provider_options, disabled_optimizers)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Repos\Plymarket\.venv\Lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py", line 599, in _create_inference_session
+    sess = C.InferenceSession(session_options, self._model_path, True, self._read_config_from_model)
+onnxruntime.capi.onnxruntime_pybind11_state.InvalidProtobuf: [ONNXRuntimeError] : 7 : INVALID_PROTOBUF : Load model from models\model_native.onnx failed:Protobuf parsing failed.
+2026-02-27 17:34:59,899 [INFERENCE] Cargando modelo desde models\model_native.onnx...
+2026-02-27 17:34:59,901 [INFERENCE] Error en loop: [ONNXRuntimeError] : 7 : INVALID_PROTOBUF : Load model from models\model_native.onnx failed:Protobuf parsing failed.
+Traceback (most recent call last):
+  File "C:\Repos\Plymarket\inference.py", line 296, in run_inference_loop
+    reloaded = loader.load_or_reload()
+  File "C:\Repos\Plymarket\inference.py", line 164, in load_or_reload
+    self._load_onnx(model_path)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Repos\Plymarket\inference.py", line 127, in _load_onnx
+    self._ort_session = ort.InferenceSession(path)
+                        ~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Repos\Plymarket\.venv\Lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py", line 504, in __init__
+    self._create_inference_session(providers, provider_options, disabled_optimizers)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Repos\Plymarket\.venv\Lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py", line 599, in _create_inference_session
+    sess = C.InferenceSession(session_options, self._model_path, True, self._read_config_from_model)
+onnxruntime.capi.onnxruntime_pybind11_state.InvalidProtobuf: [ONNXRuntimeError] : 7 : INVALID_PROTOBUF : Load model from models\model_native.onnx failed:Protobuf parsing failed.
+2026-02-27 17:35:59,903 [INFERENCE] Cargando modelo desde models\model_native.onnx...
+2026-02-27 17:35:59,905 [INFERENCE] Error en loop: [ONNXRuntimeError] : 7 : INVALID_PROTOBUF : Load model from models\model_native.onnx failed:Protobuf parsing failed.
+Traceback (most recent call last):
+  File "C:\Repos\Plymarket\inference.py", line 296, in run_inference_loop
+    reloaded = loader.load_or_reload()
+  File "C:\Repos\Plymarket\inference.py", line 164, in load_or_reload
+    self._load_onnx(model_path)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Repos\Plymarket\inference.py", line 127, in _load_onnx
+    self._ort_session = ort.InferenceSession(path)
+                        ~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Repos\Plymarket\.venv\Lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py", line 504, in __init__
+    self._create_inference_session(providers, provider_options, disabled_optimizers)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Repos\Plymarket\.venv\Lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py", line 599, in _create_inference_session
+    sess = C.InferenceSession(session_options, self._model_path, True, self._read_config_from_model)
+onnxruntime.capi.onnxruntime_pybind11_state.InvalidProtobuf: [ONNXRuntimeError] : 7 : INVALID_PROTOBUF : Load model from models\model_native.onnx failed:Protobuf parsing failed.
+2026-02-27 17:36:59,907 [INFERENCE] Cargando modelo desde models\model_native.onnx...
+2026-02-27 17:36:59,909 [INFERENCE] Error en loop: [ONNXRuntimeError] : 7 : INVALID_PROTOBUF : Load model from models\model_native.onnx failed:Protobuf parsing failed.
+Traceback (most recent call last):
+  File "C:\Repos\Plymarket\inference.py", line 296, in run_inference_loop
+    reloaded = loader.load_or_reload()
+  File "C:\Repos\Plymarket\inference.py", line 164, in load_or_reload
+    self._load_onnx(model_path)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Repos\Plymarket\inference.py", line 127, in _load_onnx
+    self._ort_session = ort.InferenceSession(path)
+                        ~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Repos\Plymarket\.venv\Lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py", line 504, in __init__
+    self._create_inference_session(providers, provider_options, disabled_optimizers)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Repos\Plymarket\.venv\Lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py", line 599, in _create_inference_session
+    sess = C.InferenceSession(session_options, self._model_path, True, self._read_config_from_model)
+onnxruntime.capi.onnxruntime_pybind11_state.InvalidProtobuf: [ONNXRuntimeError] : 7 : INVALID_PROTOBUF : Load model from models\model_native.onnx failed:Protobuf parsing failed.
+2026-02-27 17:38:45,269 [INFERENCE] =======================================================
+2026-02-27 17:38:45,269 [INFERENCE]   INFERENCE ENGINE arrancado
+2026-02-27 17:38:45,269 [INFERENCE]   Intervalo: 60s
+2026-02-27 17:38:45,269 [INFERENCE]   Threshold bueno: 65%
+2026-02-27 17:38:45,269 [INFERENCE] =======================================================
+2026-02-27 17:38:45,270 [INFERENCE] Cargando modelo desde models\model.xgb.json...
+2026-02-27 17:38:45,284 [INFERENCE] Modelo XGBoost cargado: models\model.xgb.json
+2026-02-27 17:38:45,286 [INFERENCE] ✅ Modelo recargado
+2026-02-27 17:43:30,829 [INFERENCE] =======================================================
+2026-02-27 17:43:30,829 [INFERENCE]   INFERENCE ENGINE arrancado
+2026-02-27 17:43:30,829 [INFERENCE]   Intervalo: 60s
+2026-02-27 17:43:30,829 [INFERENCE]   Threshold bueno: 65%
+2026-02-27 17:43:30,829 [INFERENCE] =======================================================
+2026-02-27 17:43:30,830 [INFERENCE] Cargando modelo desde models\model.xgb.json...
+2026-02-27 17:43:30,837 [INFERENCE] Modelo XGBoost cargado: models\model.xgb.json
+2026-02-27 17:43:30,839 [INFERENCE] ✅ Modelo recargado
+2026-02-27 17:47:56,133 [INFERENCE] =======================================================
+2026-02-27 17:47:56,133 [INFERENCE]   INFERENCE ENGINE arrancado
+2026-02-27 17:47:56,133 [INFERENCE]   Intervalo: 60s
+2026-02-27 17:47:56,133 [INFERENCE]   Threshold bueno: 65%
+2026-02-27 17:47:56,133 [INFERENCE] =======================================================
+2026-02-27 17:47:56,133 [INFERENCE] Cargando modelo desde models\model.xgb.json...
+2026-02-27 17:47:56,141 [INFERENCE] Modelo XGBoost cargado: models\model.xgb.json
+2026-02-27 17:47:56,142 [INFERENCE] ✅ Modelo recargado
+2026-02-27 17:54:18,075 [INFERENCE] =======================================================
+2026-02-27 17:54:18,075 [INFERENCE]   INFERENCE ENGINE arrancado
+2026-02-27 17:54:18,076 [INFERENCE]   Intervalo: 60s
+2026-02-27 17:54:18,076 [INFERENCE]   Threshold bueno: 65%
+2026-02-27 17:54:18,076 [INFERENCE] =======================================================
+2026-02-27 17:54:18,076 [INFERENCE] ⚠️  Modelo no disponible aún — esperando a que trainer.py lo genere...
+2026-02-27 17:55:20,625 [INFERENCE] Cargando modelo desde models\model.xgb.json...
+2026-02-27 17:55:20,632 [INFERENCE] Modelo XGBoost cargado: models\model.xgb.json
+2026-02-27 17:55:20,643 [INFERENCE] ✅ Modelo recargado
+2026-02-27 18:07:52,141 [INFERENCE] =======================================================
+2026-02-27 18:07:52,141 [INFERENCE]   INFERENCE ENGINE arrancado
+2026-02-27 18:07:52,141 [INFERENCE]   Intervalo: 60s
+2026-02-27 18:07:52,141 [INFERENCE]   Threshold bueno: 65%
+2026-02-27 18:07:52,141 [INFERENCE] =======================================================
+2026-02-27 18:07:52,142 [INFERENCE] Cargando modelo desde models\model.xgb.json...
+2026-02-27 18:07:52,210 [INFERENCE] Modelo XGBoost cargado: models\model.xgb.json
+2026-02-27 18:07:52,211 [INFERENCE] ✅ Modelo recargado
+2026-02-27 18:09:41,405 [INFERENCE] =======================================================
+2026-02-27 18:09:41,405 [INFERENCE]   INFERENCE ENGINE arrancado
+2026-02-27 18:09:41,405 [INFERENCE]   Intervalo: 60s
+2026-02-27 18:09:41,405 [INFERENCE]   Threshold bueno: 65%
+2026-02-27 18:09:41,405 [INFERENCE] =======================================================
+2026-02-27 18:09:41,406 [INFERENCE] Cargando modelo desde models\model.xgb.json...
+2026-02-27 18:09:41,479 [INFERENCE] Modelo XGBoost cargado: models\model.xgb.json
+2026-02-27 18:09:41,479 [INFERENCE] ✅ Modelo recargado
+2026-02-27 18:14:25,790 [INFERENCE] =======================================================
+2026-02-27 18:14:25,790 [INFERENCE]   INFERENCE ENGINE arrancado
+2026-02-27 18:14:25,791 [INFERENCE]   Intervalo: 60s
+2026-02-27 18:14:25,791 [INFERENCE]   Threshold bueno: 65%
+2026-02-27 18:14:25,792 [INFERENCE] =======================================================
+2026-02-27 18:14:25,792 [INFERENCE] Cargando modelo desde models\model.xgb.json...
+2026-02-27 18:14:25,859 [INFERENCE] Modelo XGBoost cargado: models\model.xgb.json
+2026-02-27 18:14:25,860 [INFERENCE] ✅ Modelo recargado
+2026-02-27 18:15:58,368 [INFERENCE] =======================================================
+2026-02-27 18:15:58,368 [INFERENCE]   INFERENCE ENGINE arrancado
+2026-02-27 18:15:58,368 [INFERENCE]   Intervalo: 60s
+2026-02-27 18:15:58,368 [INFERENCE]   Threshold bueno: 65%
+2026-02-27 18:15:58,368 [INFERENCE] =======================================================
+2026-02-27 18:15:58,369 [INFERENCE] Cargando modelo desde models\model.xgb.json...
+2026-02-27 18:15:58,438 [INFERENCE] Modelo XGBoost cargado: models\model.xgb.json
+2026-02-27 18:15:58,438 [INFERENCE] ✅ Modelo recargado
+2026-02-27 18:16:34,882 [INFERENCE] =======================================================
+2026-02-27 18:16:34,882 [INFERENCE]   INFERENCE ENGINE arrancado
+2026-02-27 18:16:34,883 [INFERENCE]   Intervalo: 60s
+2026-02-27 18:16:34,883 [INFERENCE]   Threshold bueno: 65%
+2026-02-27 18:16:34,883 [INFERENCE] =======================================================
+2026-02-27 18:16:34,883 [INFERENCE] Cargando modelo desde models\model.xgb.json...
+2026-02-27 18:16:34,951 [INFERENCE] Modelo XGBoost cargado: models\model.xgb.json
+2026-02-27 18:16:34,951 [INFERENCE] ✅ Modelo recargado
+2026-02-27 18:17:37,685 [INFERENCE] Cargando modelo desde models\model.xgb.json...
+2026-02-27 18:17:37,699 [INFERENCE] Modelo XGBoost cargado: models\model.xgb.json
+2026-02-27 18:17:37,712 [INFERENCE] ✅ Modelo recargado
+2026-02-27 18:25:23,625 [INFERENCE] =======================================================
+2026-02-27 18:25:23,626 [INFERENCE]   INFERENCE ENGINE arrancado
+2026-02-27 18:25:23,626 [INFERENCE]   Intervalo: 60s
+2026-02-27 18:25:23,626 [INFERENCE]   Threshold bueno: 65%
+2026-02-27 18:25:23,626 [INFERENCE] =======================================================
+2026-02-27 18:25:23,626 [INFERENCE] Cargando modelo desde models\model.xgb.json...
+2026-02-27 18:25:23,640 [INFERENCE] Modelo XGBoost cargado: models\model.xgb.json
+2026-02-27 18:25:23,665 [INFERENCE] ✅ Modelo recargado
+2026-02-27 18:45:13,613 [INFERENCE] =======================================================
+2026-02-27 18:45:13,613 [INFERENCE]   INFERENCE ENGINE arrancado
+2026-02-27 18:45:13,613 [INFERENCE]   Intervalo: 60s
+2026-02-27 18:45:13,613 [INFERENCE]   Threshold bueno: 65%
+2026-02-27 18:45:13,613 [INFERENCE] =======================================================
+2026-02-27 18:45:13,613 [INFERENCE] Cargando modelo desde models\model.xgb.json...
+2026-02-27 18:45:13,680 [INFERENCE] Modelo XGBoost cargado: models\model.xgb.json
+2026-02-27 18:45:13,681 [INFERENCE] ✅ Modelo recargado
+2026-02-27 18:45:32,854 [INFERENCE] =======================================================
+2026-02-27 18:45:32,854 [INFERENCE]   INFERENCE ENGINE arrancado
+2026-02-27 18:45:32,854 [INFERENCE]   Intervalo: 60s
+2026-02-27 18:45:32,854 [INFERENCE]   Threshold bueno: 65%
+2026-02-27 18:45:32,854 [INFERENCE] =======================================================
+2026-02-27 18:45:32,855 [INFERENCE] Cargando modelo desde models\model.xgb.json...
+2026-02-27 18:45:32,921 [INFERENCE] Modelo XGBoost cargado: models\model.xgb.json
+2026-02-27 18:45:32,922 [INFERENCE] ✅ Modelo recargado
+2026-02-27 18:47:51,033 [INFERENCE] =======================================================
+2026-02-27 18:47:51,033 [INFERENCE]   INFERENCE ENGINE arrancado
+2026-02-27 18:47:51,033 [INFERENCE]   Intervalo: 60s
+2026-02-27 18:47:51,033 [INFERENCE]   Threshold bueno: 65%
+2026-02-27 18:47:51,033 [INFERENCE] =======================================================
+2026-02-27 18:47:51,033 [INFERENCE] Cargando modelo desde models\model.xgb.json...
+2026-02-27 18:47:51,102 [INFERENCE] Modelo XGBoost cargado: models\model.xgb.json
+2026-02-27 18:47:51,102 [INFERENCE] ✅ Modelo recargado
+2026-02-27 18:48:02,160 [INFERENCE] =======================================================
+2026-02-27 18:48:02,160 [INFERENCE]   INFERENCE ENGINE arrancado
+2026-02-27 18:48:02,161 [INFERENCE]   Intervalo: 60s
+2026-02-27 18:48:02,161 [INFERENCE]   Threshold bueno: 65%
+2026-02-27 18:48:02,161 [INFERENCE] =======================================================
+2026-02-27 18:48:02,161 [INFERENCE] Cargando modelo desde models\model.xgb.json...
+2026-02-27 18:48:02,245 [INFERENCE] Modelo XGBoost cargado: models\model.xgb.json
+2026-02-27 18:48:02,246 [INFERENCE] ✅ Modelo recargado
+2026-02-27 18:48:50,421 [INFERENCE] =======================================================
+2026-02-27 18:48:50,422 [INFERENCE]   INFERENCE ENGINE arrancado
+2026-02-27 18:48:50,422 [INFERENCE]   Intervalo: 60s
+2026-02-27 18:48:50,422 [INFERENCE]   Threshold bueno: 65%
+2026-02-27 18:48:50,422 [INFERENCE] =======================================================
+2026-02-27 18:48:50,422 [INFERENCE] Cargando modelo desde models\model.xgb.json...
+2026-02-27 18:48:50,496 [INFERENCE] Modelo XGBoost cargado: models\model.xgb.json
+2026-02-27 18:48:50,496 [INFERENCE] ✅ Modelo recargado
+2026-02-27 18:49:06,700 [INFERENCE] =======================================================
+2026-02-27 18:49:06,701 [INFERENCE]   INFERENCE ENGINE arrancado
+2026-02-27 18:49:06,701 [INFERENCE]   Intervalo: 60s
+2026-02-27 18:49:06,701 [INFERENCE]   Threshold bueno: 65%
+2026-02-27 18:49:06,701 [INFERENCE] =======================================================
+2026-02-27 18:49:06,701 [INFERENCE] Cargando modelo desde models\model.xgb.json...
+2026-02-27 18:49:06,778 [INFERENCE] Modelo XGBoost cargado: models\model.xgb.json
+2026-02-27 18:49:06,778 [INFERENCE] ✅ Modelo recargado
+2026-02-27 18:49:50,533 [INFERENCE] =======================================================
+2026-02-27 18:49:50,533 [INFERENCE]   INFERENCE ENGINE arrancado
+2026-02-27 18:49:50,533 [INFERENCE]   Intervalo: 60s
+2026-02-27 18:49:50,533 [INFERENCE]   Threshold bueno: 65%
+2026-02-27 18:49:50,534 [INFERENCE] =======================================================
+2026-02-27 18:49:50,534 [INFERENCE] Cargando modelo desde models\model.xgb.json...
+2026-02-27 18:49:50,600 [INFERENCE] Modelo XGBoost cargado: models\model.xgb.json
+2026-02-27 18:49:50,600 [INFERENCE] ✅ Modelo recargado
+2026-02-27 18:50:39,582 [INFERENCE] =======================================================
+2026-02-27 18:50:39,582 [INFERENCE]   INFERENCE ENGINE arrancado
+2026-02-27 18:50:39,582 [INFERENCE]   Intervalo: 60s
+2026-02-27 18:50:39,583 [INFERENCE]   Threshold bueno: 65%
+2026-02-27 18:50:39,583 [INFERENCE] =======================================================
+2026-02-27 18:50:39,583 [INFERENCE] ⚠️  Modelo no disponible aún — esperando a que trainer.py lo genere...
+2026-02-27 18:55:11,646 [INFERENCE] =======================================================
+2026-02-27 18:55:11,646 [INFERENCE]   INFERENCE ENGINE arrancado
+2026-02-27 18:55:11,646 [INFERENCE]   Intervalo: 60s
+2026-02-27 18:55:11,647 [INFERENCE]   Threshold bueno: 65%
+2026-02-27 18:55:11,647 [INFERENCE] =======================================================
+2026-02-27 18:55:11,647 [INFERENCE] ⚠️  Modelo no disponible aún — esperando a que trainer.py lo genere...
+2026-02-27 19:12:06,779 [INFERENCE] =======================================================
+2026-02-27 19:12:06,779 [INFERENCE]   INFERENCE ENGINE arrancado
+2026-02-27 19:12:06,779 [INFERENCE]   Intervalo: 60s
+2026-02-27 19:12:06,779 [INFERENCE]   Threshold bueno: 65%
+2026-02-27 19:12:06,779 [INFERENCE] =======================================================
+2026-02-27 19:12:06,780 [INFERENCE] ⚠️  Modelo no disponible aún — esperando a que trainer.py lo genere...
+2026-02-27 19:33:59,692 [INFERENCE] =======================================================
+2026-02-27 19:33:59,692 [INFERENCE]   INFERENCE ENGINE arrancado
+2026-02-27 19:33:59,693 [INFERENCE]   Intervalo: 60s
+2026-02-27 19:33:59,693 [INFERENCE]   Threshold bueno: 65%
+2026-02-27 19:33:59,693 [INFERENCE] =======================================================
+2026-02-27 19:33:59,693 [INFERENCE] ⚠️  Modelo no disponible aún — esperando a que trainer.py lo genere...
+2026-02-28 11:28:41,686 [INFERENCE] =======================================================
+2026-02-28 11:28:41,686 [INFERENCE]   INFERENCE ENGINE arrancado
+2026-02-28 11:28:41,687 [INFERENCE]   Intervalo: 60s
+2026-02-28 11:28:41,687 [INFERENCE]   Threshold bueno: 65%
+2026-02-28 11:28:41,687 [INFERENCE] =======================================================
+2026-02-28 11:28:41,687 [INFERENCE] Cargando modelo desde models\model.xgb.json...
+2026-02-28 11:28:41,736 [INFERENCE] Modelo XGBoost cargado: models\model.xgb.json
+2026-02-28 11:28:41,749 [INFERENCE] ✅ Modelo recargado
+2026-02-28 11:29:58,240 [INFERENCE] Cargando modelo desde models\model.xgb.json...
+2026-02-28 11:29:58,252 [INFERENCE] Modelo XGBoost cargado: models\model.xgb.json
+2026-02-28 11:29:58,253 [INFERENCE] ✅ Modelo recargado
+2026-03-01 23:09:37,225 [INFERENCE] DriftMonitor baseline establecido: 0.650
+2026-03-01 23:09:37,228 [INFERENCE] DriftMonitor baseline establecido: 0.650
+2026-03-01 23:09:37,229 [INFERENCE] DriftMonitor baseline establecido: 0.650
+2026-03-01 23:09:37,230 [INFERENCE] DriftMonitor baseline actualizado a 0.483
+2026-03-01 23:09:37,231 [INFERENCE] DriftMonitor baseline establecido: 0.400
+2026-03-01 23:09:37,232 [INFERENCE] DriftMonitor baseline actualizado a 0.533
+2026-03-01 23:09:37,232 [INFERENCE] DriftMonitor baseline actualizado a 0.667
+2026-03-01 23:09:37,232 [INFERENCE] DriftMonitor baseline actualizado a 0.800
+2026-03-01 23:09:37,234 [INFERENCE] DriftMonitor baseline establecido: 0.650
+2026-03-01 23:09:37,235 [INFERENCE] DriftMonitor baseline establecido: 0.650
+2026-03-01 23:09:37,235 [INFERENCE] DriftMonitor baseline actualizado a 0.483
+2026-03-01 23:09:55,103 [INFERENCE] DriftMonitor baseline establecido: 0.650
+2026-03-01 23:09:55,105 [INFERENCE] DriftMonitor baseline establecido: 0.650
+2026-03-01 23:09:55,107 [INFERENCE] DriftMonitor baseline establecido: 0.650
+2026-03-01 23:09:55,108 [INFERENCE] DriftMonitor baseline actualizado a 0.483
+2026-03-01 23:09:55,109 [INFERENCE] DriftMonitor baseline establecido: 0.400
+2026-03-01 23:09:55,110 [INFERENCE] DriftMonitor baseline actualizado a 0.533
+2026-03-01 23:09:55,110 [INFERENCE] DriftMonitor baseline actualizado a 0.667
+2026-03-01 23:09:55,110 [INFERENCE] DriftMonitor baseline actualizado a 0.800
+2026-03-01 23:09:55,111 [INFERENCE] DriftMonitor baseline establecido: 0.650
+2026-03-01 23:09:55,112 [INFERENCE] DriftMonitor baseline establecido: 0.650
+2026-03-01 23:09:55,113 [INFERENCE] DriftMonitor baseline actualizado a 0.483

@@ -1,0 +1,53 @@
+{
+  "auc": 0.8457,
+  "n_train": 6211,
+  "n_test": 1553,
+  "n_good_train": 444,
+  "n_good_test": 129,
+  "trained_at": "2026-02-28T10:29:43.432141+00:00",
+  "features": [
+    "volume_24h",
+    "volume_total",
+    "liquidity",
+    "num_traders",
+    "price_yes",
+    "price_distance_from_50",
+    "days_to_close",
+    "price_change_24h",
+    "liquidity_to_volume_ratio",
+    "volume_acceleration",
+    "category_encoded"
+  ],
+  "top_features": [
+    [
+      "volume_24h",
+      "0.51493317"
+    ],
+    [
+      "liquidity",
+      "0.19053057"
+    ],
+    [
+      "volume_total",
+      "0.13016888"
+    ],
+    [
+      "price_distance_from_50",
+      "0.095636055"
+    ],
+    [
+      "liquidity_to_volume_ratio",
+      "0.026905965"
+    ]
+  ],
+  "regularized": false,
+  "walk_forward": {
+    "wf_aucs": [
+      0.7967
+    ],
+    "wf_mean": 0.7967,
+    "wf_std": 0.0,
+    "wf_folds": 1
+  },
+  "n_total": 15958
+}

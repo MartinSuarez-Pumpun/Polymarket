@@ -1,0 +1,52 @@
+2026-02-27 18:06:24,618 [RELABEL] Cargando data\markets_raw.jsonl...
+2026-02-27 18:06:24,632 [RELABEL]   2048 registros cargados
+2026-02-27 18:06:24,632 [RELABEL]   Antes: 0 labels reales | 70 buenos
+2026-02-27 18:06:24,634 [RELABEL]   Después: 1943 labels reales | 2013 buenos / 35 malos
+2026-02-27 18:06:24,634 [RELABEL]   Ratio buenos: 98.3%
+2026-02-27 18:06:24,634 [RELABEL]   Backup guardado en data\markets_raw.jsonl.bak
+2026-02-27 18:06:24,653 [RELABEL] Dataset re-etiquetado guardado. Ahora ejecuta: python main.py train
+2026-02-27 18:06:40,357 [RELABEL] Cargando data\markets_raw.jsonl...
+2026-02-27 18:06:40,372 [RELABEL]   2048 registros cargados
+2026-02-27 18:06:40,372 [RELABEL]   Antes: 1943 labels reales | 2013 buenos
+2026-02-27 18:06:40,374 [RELABEL]   Después: 1943 labels reales | 2013 buenos / 35 malos
+2026-02-27 18:06:40,374 [RELABEL]   Ratio buenos: 98.3%
+2026-02-27 18:07:30,347 [RELABEL] Cargando data\markets_raw.jsonl...
+2026-02-27 18:07:30,362 [RELABEL]   2048 registros cargados
+2026-02-27 18:07:30,363 [RELABEL]   Antes: 1943 labels reales | 2013 buenos
+2026-02-27 18:07:30,365 [RELABEL]   Después: 1943 labels reales | 2013 buenos / 35 malos
+2026-02-27 18:07:30,365 [RELABEL]   Ratio buenos: 98.3%
+2026-02-27 18:07:30,366 [RELABEL]   Backup guardado en data\markets_raw.jsonl.bak
+2026-02-27 18:07:30,381 [RELABEL] Dataset re-etiquetado guardado. Ahora ejecuta: python main.py train
+2026-02-27 18:15:25,175 [RELABEL] Cargando data\markets_raw.jsonl...
+2026-02-27 18:15:25,192 [RELABEL]   2448 registros cargados
+2026-02-27 18:15:25,193 [RELABEL]   Antes: 1943 labels reales | 2252 buenos
+2026-02-27 18:15:25,195 [RELABEL]   Después: 1943 labels reales | 2252 buenos / 196 malos
+2026-02-27 18:15:25,195 [RELABEL]   Ratio buenos: 92.0%
+2026-02-27 18:15:40,515 [RELABEL] Cargando data\markets_raw.jsonl...
+2026-02-27 18:15:40,531 [RELABEL]   2448 registros cargados
+2026-02-27 18:15:40,532 [RELABEL]   Antes: 1943 labels reales | 2252 buenos
+2026-02-27 18:15:40,534 [RELABEL]   Después: 1943 labels reales | 2252 buenos / 196 malos
+2026-02-27 18:15:40,534 [RELABEL]   Ratio buenos: 92.0%
+2026-02-27 18:15:40,534 [RELABEL]   Backup guardado en data\markets_raw.jsonl.bak
+2026-02-27 18:15:40,555 [RELABEL] Dataset re-etiquetado guardado. Ahora ejecuta: python main.py train
+2026-02-27 19:35:43,913 [RELABEL] Cargando data\markets_raw.jsonl...
+2026-02-27 19:35:43,988 [RELABEL]   8195 registros cargados
+2026-02-27 19:35:43,990 [RELABEL]   Antes: 130 labels reales | 612 buenos
+2026-02-27 19:35:43,999 [RELABEL]   Después: 130 labels reales | 612 buenos / 7583 malos
+2026-02-27 19:35:43,999 [RELABEL]   Ratio buenos: 7.5%
+2026-02-27 19:35:44,000 [RELABEL]   Backup guardado en data\markets_raw.jsonl.bak
+2026-02-27 19:35:44,077 [RELABEL] Dataset re-etiquetado guardado. Ahora ejecuta: python main.py train
+2026-02-27 21:17:19,892 [RELABEL] Cargando data\markets_raw.jsonl...
+2026-02-27 21:17:19,959 [RELABEL]   8195 registros cargados
+2026-02-27 21:17:19,960 [RELABEL]   Labels actuales: 612 buenos / 7583 malos
+2026-02-27 21:17:19,968 [RELABEL]   Labels nuevos: 1039 buenos (12.7%) / 7156 malos (87.3%)
+2026-02-27 21:17:19,973 [RELABEL]   Backup en data\markets_raw.jsonl.bak2
+2026-02-27 21:17:20,042 [RELABEL] Relabel completado. Ejecuta: python main.py train
+2026-02-27 21:17:20,043 [RELABEL] Objetivo: AUC 0.65-0.80 (si sale >0.95 hay otro problema)
+2026-02-27 21:17:43,205 [RELABEL] Cargando data\markets_raw.jsonl...
+2026-02-27 21:17:43,271 [RELABEL]   8195 registros cargados
+2026-02-27 21:17:43,272 [RELABEL]   Labels actuales: 1039 buenos / 7156 malos
+2026-02-27 21:17:43,279 [RELABEL]   Labels nuevos: 1039 buenos (12.7%) / 7156 malos (87.3%)
+2026-02-27 21:17:43,283 [RELABEL]   Backup en data\markets_raw.jsonl.bak2
+2026-02-27 21:17:43,355 [RELABEL] Relabel completado. Ejecuta: python main.py train
+2026-02-27 21:17:43,355 [RELABEL] Objetivo: AUC 0.65-0.80 (si sale >0.95 hay otro problema)

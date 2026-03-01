@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>POLYMARKET AI // SIGNAL BOARD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  /* ── Reset & Base ────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:         #080b0f;
+    --bg2:        #0d1117;
+    --bg3:        #111820;
+    --border:     #1e2a38;
+    --text:       #c8d6e5;
+    --dim:        #4a5a6b;
+    --accent:     #00e5ff;
+
+    --green:      #00ff88;
+    --green-dim:  #003d20;
+    --green-glow: rgba(0,255,136,0.12);
+
+    --yellow:     #ffd60a;
+    --yellow-dim: #2a2200;
+    --yellow-glow:rgba(255,214,10,0.10);
+
+    --red:        #ff3b5c;
+    --red-dim:    #2a000d;
+    --red-glow:   rgba(255,59,92,0.12);
+
+    --whale:      #bf7fff;
+    --spike:      #ff9500;
+
+    --mono: 'Space Mono', monospace;
+    --sans: 'Syne', sans-serif;
+
+    --col-w: calc((100% - 4rem) / 3);
+    --card-h: 130px;
+  }
+
+  html { font-size: 14px; scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--mono);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Scan line overlay ───────────────────────────────────── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 1000;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.04) 2px,
+      rgba(0,0,0,0.04) 4px
+    );
+    pointer-events: none;
+  }
+
+  /* ── Header ──────────────────────────────────────────────── */
+  header {
+    padding: 1.5rem 2rem 1rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: baseline;
+    gap: 2rem;
+    flex-wrap: wrap;
+    position: sticky; top: 0; z-index: 100;
+    background: var(--bg);
+    backdrop-filter: blur(12px);
+  }
+
+  .logo {
+    font-family: var(--sans);
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: #fff;
+    white-space: nowrap;
+  }
+
+  .logo span {
+    color: var(--accent);
+  }
+
+  .header-meta {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    flex: 1;
+  }
+
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .meta-label {
+    font-size: 0.6rem;
+    color: var(--dim);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  .meta-value {
+    font-size: 0.85rem;
+    color: var(--text);
+  }
+
+  .meta-value.green  { color: var(--green); }
+  .meta-value.yellow { color: var(--yellow); }
+  .meta-value.red    { color: var(--red); }
+  .meta-value.accent { color: var(--accent); }
+
+  .pulse {
+    display: inline-block;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+    margin-right: 6px;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  .pulse.offline { background: var(--red); box-shadow: 0 0 8px var(--red); animation: none; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* ── Ticker bar ──────────────────────────────────────────── */
+  .ticker-wrap {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    height: 32px;
+    display: flex;
+    align-items: center;
+  }
+
+  .ticker-track {
+    display: flex;
+    gap: 3rem;
+    white-space: nowrap;
+    animation: ticker 40s linear infinite;
+    padding-left: 100%;
+  }
+
+  .ticker-track:hover { animation-play-state: paused; }
+
+  .ticker-item {
+    font-size: 0.7rem;
+    color: var(--dim);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .ticker-item .tag {
+    padding: 1px 6px;
+    border-radius: 2px;
+    font-size: 0.6rem;
+    font-weight: 700;
+  }
+
+  .ticker-item .tag.w { background: var(--whale); color: #000; }
+  .ticker-item .tag.s { background: var(--spike); color: #000; }
+
+  @keyframes ticker {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* ── Column headers ──────────────────────────────────────── */
+  .columns-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+    padding: 1.5rem 2rem 0;
+  }
+
+  .col-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid;
+  }
+
+  .col-header.segura   { border-color: var(--green); }
+  .col-header.cincuenta { border-color: var(--yellow); }
+  .col-header.nono     { border-color: var(--red); }
+
+  .col-icon {
+    font-size: 1.4rem;
+    line-height: 1;
+  }
+
+  .col-title {
+    font-family: var(--sans);
+    font-weight: 800;
+    font-size: 1rem;
+    letter-spacing: -0.01em;
+  }
+
+  .col-header.segura   .col-title { color: var(--green); }
+  .col-header.cincuenta .col-title { color: var(--yellow); }
+  .col-header.nono     .col-title { color: var(--red); }
+
+  .col-count {
+    margin-left: auto;
+    font-size: 0.7rem;
+    color: var(--dim);
+    border: 1px solid var(--border);
+    padding: 2px 8px;
+    border-radius: 2px;
+  }
+
+  /* ── Board ───────────────────────────────────────────────── */
+  .board {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+    padding: 1rem 2rem 2rem;
+    align-items: start;
+  }
+
+  .column {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-height: 200px;
+  }
+
+  /* ── Cards ───────────────────────────────────────────────── */
+  .card {
+    position: relative;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.85rem 1rem;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    transition: transform 0.15s, border-color 0.15s, background 0.15s;
+    overflow: hidden;
+    animation: fadeSlide 0.3s ease both;
+  }
+
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    border-radius: 4px 0 0 4px;
+  }
+
+  .card.segura::before    { background: var(--green); }
+  .card.cincuenta::before { background: var(--yellow); }
+  .card.nono::before      { background: var(--red); }
+
+  .card.segura:hover    { border-color: var(--green); background: var(--green-glow); transform: translateX(2px); }
+  .card.cincuenta:hover { border-color: var(--yellow); background: var(--yellow-glow); transform: translateX(2px); }
+  .card.nono:hover      { border-color: var(--red); background: var(--red-glow); transform: translateX(2px); }
+
+  /* Badge whale/spike */
+  .card-badges {
+    position: absolute;
+    top: 0.5rem; right: 0.6rem;
+    display: flex;
+    gap: 4px;
+  }
+
+  .badge {
+    font-size: 0.55rem;
+    font-weight: 700;
+    padding: 2px 5px;
+    border-radius: 2px;
+    letter-spacing: 0.08em;
+  }
+
+  .badge.whale { background: var(--whale); color: #000; }
+  .badge.spike { background: var(--spike); color: #000; }
+  .badge.multi { background: var(--border); color: var(--dim); border: 1px solid var(--dim); }
+
+  /* ── AI Pick summary bajo el título ──────────────────────── */
+  .card-pick {
+    display: flex; align-items: center; gap: 0.4rem;
+    font-size: 0.60rem; margin-bottom: 0.55rem; padding-right: 3.5rem;
+  }
+  .pick-tag {
+    font-size: 0.46rem; font-weight: 700; letter-spacing: 0.12em;
+    padding: 2px 6px; border-radius: 2px; flex-shrink: 0;
+    background: var(--accent); color: #000;
+  }
+  .pick-text {
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    color: var(--accent); opacity: 0.9;
+  }
+
+  /* ── Outcomes toggle button ──────────────────────────────── */
+  .outcomes-toggle {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: none; border: 1px solid var(--border);
+    border-radius: 3px; padding: 4px 10px;
+    color: var(--dim); font-family: var(--mono); font-size: 0.52rem;
+    cursor: pointer; margin-top: 0.55rem; letter-spacing: 0.05em;
+    transition: border-color 0.15s, color 0.15s; width: fit-content;
+  }
+  .outcomes-toggle:hover { border-color: var(--accent); color: var(--accent); }
+  .outcomes-toggle .arrow { transition: transform 0.2s; }
+  .outcomes-toggle.open   { border-color: var(--accent); color: var(--accent); }
+  .outcomes-toggle.open .arrow { transform: rotate(180deg); }
+
+  /* ── Outcomes dropdown ───────────────────────────────────── */
+  .outcomes-dropdown {
+    display: none; margin-top: 6px;
+    border: 1px solid var(--border); border-radius: 4px;
+    overflow: hidden; background: var(--bg);
+  }
+  .outcomes-dropdown.open { display: block; }
+
+  .outcome-row {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    border-bottom: 1px solid var(--border);
+    text-decoration: none;
+    color: var(--text);
+    transition: background 0.1s;
+    font-size: 0.58rem;
+  }
+  .outcome-row:last-child { border-bottom: none; }
+  .outcome-row:hover { background: var(--bg3); }
+
+  /* Flag colors */
+  .flag-pick     { background: var(--accent);  color: #000; }
+  .flag-ok       { background: var(--green);   color: #000; }
+  .flag-saturado { background: var(--dim);     color: #000; }
+  .flag-skip     { background: transparent;    color: var(--dim); border: 1px solid var(--dim); }
+
+  .outcome-flag {
+    font-size: 0.43rem; font-weight: 700; letter-spacing: 0.1em;
+    padding: 2px 5px; border-radius: 2px; white-space: nowrap; flex-shrink: 0;
+  }
+  .outcome-name {
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    line-height: 1.3;
+  }
+  .outcome-row.flag-is-pick .outcome-name { color: var(--accent); }
+  .outcome-row.flag-is-ok   .outcome-name { color: var(--green); opacity: 0.9; }
+  .outcome-row.flag-is-skip .outcome-name { color: var(--dim); }
+  .outcome-row.flag-is-saturado .outcome-name { color: var(--dim); }
+
+  .outcome-right {
+    display: flex; align-items: center; gap: 6px;
+    flex-shrink: 0; text-align: right;
+  }
+  .outcome-price {
+    font-weight: 700; font-size: 0.62rem; min-width: 2.5rem; text-align: right;
+  }
+  .outcome-row.flag-is-pick     .outcome-price { color: var(--accent); }
+  .outcome-row.flag-is-ok       .outcome-price { color: var(--green); }
+  .outcome-row.flag-is-saturado .outcome-price { color: var(--dim); }
+  .outcome-row.flag-is-skip     .outcome-price { color: var(--dim); }
+
+  .outcome-reason {
+    font-size: 0.48rem; color: var(--dim); margin-top: 1px;
+    grid-column: 2 / 4; padding-left: 0; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
+  }
+
+  .card-question {
+    font-size: 0.72rem;
+    line-height: 1.45;
+    color: var(--text);
+    margin-bottom: 0.6rem;
+    padding-right: 3rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .card-prob {
+    font-family: var(--sans);
+    font-weight: 800;
+    font-size: 1.1rem;
+    line-height: 1;
+  }
+
+  .card.segura    .card-prob { color: var(--green); }
+  .card.cincuenta .card-prob { color: var(--yellow); }
+  .card.nono      .card-prob { color: var(--red); }
+
+  .card-stat {
+    font-size: 0.6rem;
+    color: var(--dim);
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .card-stat strong {
+    color: var(--text);
+    font-weight: 400;
+  }
+
+  /* Prob bar */
+  .prob-bar-wrap {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--border);
+  }
+
+  .prob-bar {
+    height: 100%;
+    transition: width 0.5s ease;
+  }
+
+  .card.segura    .prob-bar { background: var(--green); }
+  .card.cincuenta .prob-bar { background: var(--yellow); }
+  .card.nono      .prob-bar { background: var(--red); }
+
+  /* ── Loading / empty states ──────────────────────────────── */
+  .loading {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 4rem;
+    color: var(--dim);
+    font-size: 0.8rem;
+  }
+
+  .loading-spinner {
+    display: inline-block;
+    width: 32px; height: 32px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-bottom: 1rem;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .empty-col {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--dim);
+    font-size: 0.65rem;
+    border: 1px dashed var(--border);
+    border-radius: 4px;
+  }
+
+  /* ── Alert panel ─────────────────────────────────────────── */
+  .alert-strip {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(8,11,15,0.95);
+    border-top: 1px solid var(--border);
+    padding: 0.5rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    z-index: 200;
+    backdrop-filter: blur(8px);
+    min-height: 42px;
+  }
+
+  .alert-label {
+    font-size: 0.6rem;
+    color: var(--dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    white-space: nowrap;
+  }
+
+  .alert-items {
+    display: flex;
+    gap: 1.5rem;
+    overflow-x: auto;
+    flex: 1;
+    scrollbar-width: none;
+  }
+
+  .alert-item {
+    font-size: 0.65rem;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    animation: fadeSlide 0.3s ease both;
+  }
+
+  .alert-item .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .alert-item.whale .dot { background: var(--whale); box-shadow: 0 0 6px var(--whale); }
+  .alert-item.spike .dot { background: var(--spike); box-shadow: 0 0 6px var(--spike); }
+
+  .no-alerts { color: var(--dim); font-size: 0.65rem; }
+
+  /* ── Error banner ────────────────────────────────────────── */
+  .error-banner {
+    display: none;
+    background: var(--red-dim);
+    border: 1px solid var(--red);
+    color: var(--red);
+    padding: 0.5rem 2rem;
+    font-size: 0.7rem;
+    text-align: center;
+  }
+
+  /* ── Alert banners (eventos inesperados) ────────────────── */
+  #alert-banners {
+    position: fixed;
+    top: 5rem;
+    right: 1.5rem;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    max-width: 380px;
+    pointer-events: none;
+  }
+
+  .alert-banner {
+    pointer-events: all;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 0.85rem 1rem 0.85rem 1rem;
+    border-radius: 4px;
+    border-left: 4px solid;
+    font-size: 0.7rem;
+    line-height: 1.5;
+    position: relative;
+    animation: bannerIn 0.35s cubic-bezier(0.22,1,0.36,1) both;
+    backdrop-filter: blur(12px);
+  }
+
+  @keyframes bannerIn {
+    from { opacity: 0; transform: translateX(40px) scale(0.96); }
+    to   { opacity: 1; transform: translateX(0) scale(1); }
+  }
+
+  @keyframes bannerOut {
+    from { opacity: 1; transform: translateX(0) scale(1); max-height: 200px; margin-bottom: 0; }
+    to   { opacity: 0; transform: translateX(40px) scale(0.94); max-height: 0; margin-bottom: -0.6rem; }
+  }
+
+  .alert-banner.dying {
+    animation: bannerOut 0.3s ease forwards;
+  }
+
+  /* WHALE — violeta */
+  .alert-banner.whale {
+    background: rgba(20, 8, 35, 0.97);
+    border-color: var(--whale);
+    box-shadow: 0 0 20px rgba(191,127,255,0.2), 0 4px 24px rgba(0,0,0,0.5);
+  }
+
+  /* SPIKE — naranja */
+  .alert-banner.spike {
+    background: rgba(25, 12, 0, 0.97);
+    border-color: var(--spike);
+    box-shadow: 0 0 20px rgba(255,149,0,0.2), 0 4px 24px rgba(0,0,0,0.5);
+  }
+
+  .alert-banner-type {
+    font-family: var(--sans);
+    font-weight: 800;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .alert-banner.whale .alert-banner-type { color: var(--whale); }
+  .alert-banner.spike .alert-banner-type { color: var(--spike); }
+
+  .alert-banner-reason {
+    color: #e8e8e8;
+    font-size: 0.7rem;
+    line-height: 1.45;
+  }
+
+  .alert-banner-reason strong {
+    color: #fff;
+  }
+
+  .alert-banner-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 0.2rem;
+  }
+
+  .alert-banner-link {
+    font-size: 0.62rem;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    padding: 3px 10px;
+    border-radius: 2px;
+    border: 1px solid;
+    transition: background 0.15s;
+  }
+
+  .alert-banner.whale .alert-banner-link {
+    color: var(--whale);
+    border-color: var(--whale);
+  }
+  .alert-banner.whale .alert-banner-link:hover {
+    background: rgba(191,127,255,0.15);
+  }
+
+  .alert-banner.spike .alert-banner-link {
+    color: var(--spike);
+    border-color: var(--spike);
+  }
+  .alert-banner.spike .alert-banner-link:hover {
+    background: rgba(255,149,0,0.15);
+  }
+
+  .alert-banner-ts {
+    font-size: 0.58rem;
+    color: var(--dim);
+  }
+
+  .alert-banner-close {
+    position: absolute;
+    top: 0.5rem; right: 0.6rem;
+    background: none; border: none;
+    color: var(--dim);
+    cursor: pointer;
+    font-size: 0.75rem;
+    line-height: 1;
+    padding: 2px 4px;
+    transition: color 0.15s;
+  }
+  .alert-banner-close:hover { color: #fff; }
+
+  /* Progress bar que va desapareciendo */
+  .alert-banner-progress {
+    position: absolute;
+    bottom: 0; left: 0;
+    height: 2px;
+    border-radius: 0 0 0 4px;
+    animation: progressDrain linear forwards;
+  }
+
+  .alert-banner.whale .alert-banner-progress { background: var(--whale); }
+  .alert-banner.spike .alert-banner-progress { background: var(--spike); }
+
+  @keyframes progressDrain {
+    from { width: 100%; }
+    to   { width: 0%; }
+  }
+
+  /* ── Scrollbar ───────────────────────────────────────────── */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* ── Responsive ──────────────────────────────────────────── */
+  @media (max-width: 900px) {
+    .board, .columns-header { grid-template-columns: 1fr; }
+    header { padding: 1rem; }
+    .board { padding: 0.5rem 1rem 5rem; }
+    .columns-header { padding: 1rem 1rem 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Header ─────────────────────────────────────────────── -->
+<header>
+  <div class="logo">POLY<span>SIGNAL</span></div>
+  <div class="header-meta">
+    <div class="meta-item">
+      <span class="meta-label">Estado</span>
+      <span class="meta-value" id="status-dot">
+        <span class="pulse offline" id="pulse"></span>
+        <span id="status-text">Conectando...</span>
+      </span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Modelo</span>
+      <span class="meta-value accent" id="model-status">—</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Mercados</span>
+      <span class="meta-value" id="market-count">—</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Ultima actualización</span>
+      <span class="meta-value" id="last-update">—</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Refresh</span>
+      <span class="meta-value" id="countdown">60s</span>
+    </div>
+  </div>
+</header>
+
+<!-- ── Error banner ───────────────────────────────────────── -->
+<div class="error-banner" id="error-banner">
+  ⚠ No se puede conectar con el servicio — asegúrate de que <code>service.py</code> está corriendo en :8000
+</div>
+
+<!-- ── Alert banners (eventos inesperados) ────────────────── -->
+<div id="alert-banners"></div>
+
+<!-- ── Ticker ─────────────────────────────────────────────── -->
+<div class="ticker-wrap">
+  <div class="ticker-track" id="ticker">
+    <span class="ticker-item">Esperando datos del servicio...</span>
+  </div>
+</div>
+
+<!-- ── Column headers ─────────────────────────────────────── -->
+<div class="columns-header">
+  <div class="col-header segura">
+    <span class="col-icon">◈</span>
+    <span class="col-title">APUESTA SEGURA</span>
+    <span class="col-count" id="count-segura">0</span>
+  </div>
+  <div class="col-header cincuenta">
+    <span class="col-icon">◇</span>
+    <span class="col-title">50 / 50</span>
+    <span class="col-count" id="count-cincuenta">0</span>
+  </div>
+  <div class="col-header nono">
+    <span class="col-icon">✕</span>
+    <span class="col-title">NO NO</span>
+    <span class="col-count" id="count-nono">0</span>
+  </div>
+</div>
+
+<!-- ── Board ──────────────────────────────────────────────── -->
+<div class="board" id="board">
+  <div class="loading">
+    <div class="loading-spinner"></div>
+    <div>Cargando mercados...</div>
+  </div>
+</div>
+
+<!-- ── Alert strip ────────────────────────────────────────── -->
+<div class="alert-strip">
+  <span class="alert-label">Alertas</span>
+  <div class="alert-items" id="alert-items">
+    <span class="no-alerts">Sin alertas recientes</span>
+  </div>
+</div>
+
+<script>
+const API = 'http://localhost:8000';
+const REFRESH_S = 30;  // segundos entre refreshes
+
+let countdown = REFRESH_S;
+let markets   = { SEGURA: [], CINCUENTA: [], NO_NO: [] };
+let connected = false;
+
+// ── Helpers ───────────────────────────────────────────────────────
+
+function fmt(n) {
+  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
+  if (n >= 1_000)     return (n / 1_000).toFixed(0) + 'K';
+  return n.toFixed(0);
+}
+
+function relTime(iso) {
+  if (!iso) return '—';
+  const diff = Math.floor((Date.now() - new Date(iso)) / 1000);
+  if (diff < 5)   return 'ahora';
+  if (diff < 60)  return diff + 's';
+  if (diff < 3600) return Math.floor(diff/60) + 'm';
+  return Math.floor(diff/3600) + 'h';
+}
+
+// ── Render card ───────────────────────────────────────────────────
+
+function flagMeta(flag) {
+  switch(flag) {
+    case "PICK":     return { cls: "flag-pick",     label: "AI PICK" };
+    case "OK":       return { cls: "flag-ok",       label: "OK" };
+    case "SATURADO": return { cls: "flag-saturado", label: "SATURADO" };
+    default:         return { cls: "flag-skip",     label: "SKIP" };
+  }
+}
+
+function renderCard(m) {
+  const cls  = m.bucket === 'NO_NO' ? 'nono' : m.bucket === 'CINCUENTA' ? 'cincuenta' : 'segura';
+  const pct  = Math.round((m.prob || m.price_yes || 0) * 100);
+  const vol  = fmt(m.volume_24h);
+  const liq  = fmt(m.liquidity);
+  const days = m.days_left > 0 ? m.days_left + 'd' : 'hoy';
+  const uid  = 'dd_' + Math.random().toString(36).slice(2, 8);
+
+  const whaleBadge = m.has_whale ? '<span class="badge whale">WHALE</span>' : '';
+  const spikeBadge = m.has_spike ? '<span class="badge spike">SPIKE</span>' : '';
+
+  // ── AI Pick summary ──────────────────────────────────────────────
+  const pickRow = (m.outcome_label && m.n_outcomes > 1)
+    ? `<div class="card-pick">
+         <span class="pick-tag">AI PICK</span>
+         <span class="pick-text">${m.outcome_label}</span>
+       </div>`
+    : '';
+
+  // ── Dropdown con flags por outcome ───────────────────────────────
+  let dropdownHtml = '';
+  if (m.outcomes && m.outcomes.length > 1) {
+    const rows = m.outcomes.map(o => {
+      const fm       = flagMeta(o.ai_flag);
+      const flagCls  = 'flag-is-' + (o.ai_flag || 'skip').toLowerCase();
+      const pricePct = Math.round((o.price || 0) * 100);
+      const reason   = o.ai_reason || '';
+      return `
+        <a class="outcome-row ${flagCls}"
+           href="${o.url}" target="_blank" rel="noopener"
+           onclick="event.stopPropagation()" title="${reason}">
+          <span class="outcome-flag ${fm.cls}">${fm.label}</span>
+          <span class="outcome-name">${o.label}</span>
+          <span class="outcome-right">
+            <span class="outcome-price">${pricePct}¢</span>
+          </span>
+          ${reason ? `<span class="outcome-reason">↳ ${reason}</span>` : ''}
+        </a>`;
+    }).join('');
+
+    const nPick = m.outcomes.filter(o => o.ai_flag === 'PICK').length;
+    const nOk   = m.outcomes.filter(o => o.ai_flag === 'OK').length;
+    const summary = nPick > 0
+      ? `${nPick} PICK · ${m.outcomes.length} outcomes`
+      : nOk > 0
+        ? `${nOk} OK · ${m.outcomes.length} outcomes`
+        : `${m.outcomes.length} outcomes`;
+
+    dropdownHtml = `
+      <button class="outcomes-toggle" onclick="toggleDropdown('${uid}', event)">
+        <span>${summary}</span>
+        <span class="arrow">▾</span>
+      </button>
+      <div class="outcomes-dropdown" id="${uid}">${rows}</div>`;
+  }
+
+  return `
+    <a class="card ${cls}" href="${m.url}" target="_blank" rel="noopener">
+      <div class="card-badges">${whaleBadge}${spikeBadge}</div>
+      <div class="card-question">${m.question}</div>
+      ${pickRow}
+      <div class="card-meta">
+        <span class="card-prob">${pct}%</span>
+        <div class="card-stat"><span class="meta-label">YES</span><strong>${Math.round((m.price_yes||0)*100)}¢</strong></div>
+        <div class="card-stat"><span class="meta-label">VOL 24H</span><strong>$${vol}</strong></div>
+        <div class="card-stat"><span class="meta-label">LIQ</span><strong>$${liq}</strong></div>
+        <div class="card-stat"><span class="meta-label">CIERRE</span><strong>${days}</strong></div>
+      </div>
+      <div class="prob-bar-wrap"><div class="prob-bar" style="width:${pct}%"></div></div>
+      ${dropdownHtml}
+    </a>`;
+}
+
+function toggleDropdown(uid, event) {
+  event.preventDefault();
+  event.stopPropagation();
+  const btn = event.currentTarget;
+  const dd  = document.getElementById(uid);
+  if (!dd) return;
+  const open = dd.classList.toggle('open');
+  btn.classList.toggle('open', open);
+}
+
+// ── Render board ──────────────────────────────────────────────────
+
+function renderBoard() {
+  const board = document.getElementById('board');
+  const s = markets.SEGURA    || [];
+  const c = markets.CINCUENTA || [];
+  const n = markets.NO_NO     || [];
+
+  document.getElementById('count-segura').textContent    = s.length;
+  document.getElementById('count-cincuenta').textContent = c.length;
+  document.getElementById('count-nono').textContent      = n.length;
+  document.getElementById('market-count').textContent    = s.length + c.length + n.length;
+
+  const maxRows = Math.max(s.length, c.length, n.length);
+  if (maxRows === 0) {
+    board.innerHTML = `<div class="loading">Sin datos aún — el servicio está procesando mercados</div>`;
+    return;
+  }
+
+  const colS = s.length ? s.map(renderCard).join('') :
+    '<div class="empty-col">Sin mercados seguros ahora</div>';
+  const colC = c.length ? c.map(renderCard).join('') :
+    '<div class="empty-col">Sin mercados 50/50 ahora</div>';
+  const colN = n.length ? n.map(renderCard).join('') :
+    '<div class="empty-col">Sin mercados NO ahora</div>';
+
+  board.innerHTML = `
+    <div class="column" id="col-segura">${colS}</div>
+    <div class="column" id="col-cincuenta">${colC}</div>
+    <div class="column" id="col-nono">${colN}</div>
+  `;
+}
+
+// ── Render alerts (strip inferior) ───────────────────────────────
+
+function renderAlerts(alerts) {
+  const el = document.getElementById('alert-items');
+  if (!alerts.length) {
+    el.innerHTML = '<span class="no-alerts">Sin alertas recientes</span>';
+    return;
+  }
+  el.innerHTML = alerts.slice(0, 20).map(a => {
+    const cls   = a.type === 'WHALE' ? 'whale' : 'spike';
+    const label = a.type === 'WHALE'
+      ? `🐋 $${fmt(a.usd_size)} — ${a.market.substring(0, 40)}`
+      : `⚡ ${a.pct > 0 ? '+' : ''}${a.pct}% — ${a.market.substring(0, 40)}`;
+    return `<span class="alert-item ${cls}">
+      <span class="dot"></span>${label}
+    </span>`;
+  }).join('');
+}
+
+// ── Alert banners (pop-up de eventos inesperados) ─────────────────
+
+const shownAlertIds = new Set();   // evitar duplicados entre refreshes
+const BANNER_TTL    = 12000;       // ms antes de auto-cerrar
+
+function alertId(a) {
+  return `${a.type}_${a.market_id}_${a.ts}`;
+}
+
+function buildAlertUrl(a) {
+  // El servicio incluye el market_id; construimos la URL de Polymarket
+  if (a.url)  return a.url;
+  const slug = a.market_slug || '';
+  if (slug)   return `https://polymarket.com/event/${slug}`;
+  return `https://polymarket.com/markets?search=${(a.market_id || '').substring(0, 8)}`;
+}
+
+function buildReason(a) {
+  if (a.type === 'WHALE') {
+    const outcome = a.outcome ? ` en <strong>${a.outcome.toUpperCase()}</strong>` : '';
+    return `Alguien acaba de meter <strong>$${fmt(a.usd_size)}</strong>${outcome} de golpe — movimiento inusualmente grande.`;
+  }
+  if (a.type === 'SPIKE') {
+    const dir = a.pct > 0 ? 'subió' : 'bajó';
+    return `El precio <strong>${dir} ${Math.abs(a.pct).toFixed(1)}%</strong> en un solo trade
+      (${a.from.toFixed(3)} → <strong>${a.to.toFixed(3)}</strong>) — posible información nueva.`;
+  }
+  return a.reason || 'Movimiento inusual detectado.';
+}
+
+function showAlertBanner(a) {
+  const id = alertId(a);
+  if (shownAlertIds.has(id)) return;
+  shownAlertIds.add(id);
+
+  const container = document.getElementById('alert-banners');
+  const cls       = a.type === 'WHALE' ? 'whale' : 'spike';
+  const icon      = a.type === 'WHALE' ? '🐋' : '⚡';
+  const typeLabel = a.type === 'WHALE' ? 'WHALE ALERT' : 'PRICE SPIKE';
+  const url       = buildAlertUrl(a);
+  const reason    = buildReason(a);
+  const ts        = new Date(a.ts).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const bannerId  = `banner_${Date.now()}_${Math.random().toString(36).slice(2,6)}`;
+
+  const el = document.createElement('div');
+  el.className = `alert-banner ${cls}`;
+  el.id = bannerId;
+  el.innerHTML = `
+    <button class="alert-banner-close" onclick="closeBanner('${bannerId}')" title="Cerrar">✕</button>
+    <div class="alert-banner-type">${icon} ${typeLabel}</div>
+    <div class="alert-banner-reason">${reason}</div>
+    <div style="font-size:0.65rem;color:#aaa;margin-top:2px;
+         white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:320px;"
+         title="${a.market}">
+      ${a.market.substring(0, 55)}${a.market.length > 55 ? '…' : ''}
+    </div>
+    <div class="alert-banner-footer">
+      <span class="alert-banner-ts">${ts}</span>
+      <a class="alert-banner-link" href="${url}" target="_blank" rel="noopener">
+        VER EN POLYMARKET →
+      </a>
+    </div>
+    <div class="alert-banner-progress" style="animation-duration:${BANNER_TTL}ms"></div>
+  `;
+
+  // Insertar al principio (más reciente arriba)
+  container.insertBefore(el, container.firstChild);
+
+  // Auto-cerrar
+  setTimeout(() => closeBanner(bannerId), BANNER_TTL);
+
+  // Limitar a 5 banners simultáneos
+  const all = container.querySelectorAll('.alert-banner:not(.dying)');
+  if (all.length > 5) closeBanner(all[all.length - 1].id);
+}
+
+function closeBanner(id) {
+  const el = document.getElementById(id);
+  if (!el || el.classList.contains('dying')) return;
+  el.classList.add('dying');
+  setTimeout(() => el.remove(), 320);
+}
+
+function processNewAlerts(alerts) {
+  // Solo los que no hemos mostrado ya y son recientes (< 90s)
+  const cutoff = Date.now() - 90_000;
+  alerts.forEach(a => {
+    if (!a.ts) return;
+    if (new Date(a.ts).getTime() < cutoff) return;
+    if (shownAlertIds.has(alertId(a))) return;
+    showAlertBanner(a);
+  });
+}
+
+// ── Ticker ────────────────────────────────────────────────────────
+
+function renderTicker(mkts, alerts) {
+  const track = document.getElementById('ticker');
+  const items = [];
+
+  alerts.slice(0, 5).forEach(a => {
+    const tag = a.type === 'WHALE' ? 'w' : 's';
+    const txt = a.type === 'WHALE'
+      ? `$${fmt(a.usd_size)} en ${a.market.substring(0, 30)}`
+      : `${a.pct > 0 ? '+' : ''}${a.pct}% en ${a.market.substring(0, 30)}`;
+    items.push(`<span class="ticker-item"><span class="tag ${tag}">${a.type}</span>${txt}</span>`);
+  });
+
+  const topMkts = (mkts.SEGURA || []).slice(0, 5);
+  topMkts.forEach(m => {
+    items.push(`<span class="ticker-item">◈ ${Math.round(m.prob*100)}% — ${m.question.substring(0, 45)}</span>`);
+  });
+
+  if (!items.length) return;
+  // Duplicar para loop continuo
+  const doubled = [...items, ...items];
+  track.innerHTML = doubled.join('');
+}
+
+// ── Fetch data ────────────────────────────────────────────────────
+
+async function fetchAll() {
+  try {
+    const [mktRes, alertRes, statusRes] = await Promise.all([
+      fetch(`${API}/markets?limit=10000`),
+      fetch(`${API}/alerts?limit=30`),
+      fetch(`${API}/status`),
+    ]);
+
+    if (!mktRes.ok) throw new Error(`HTTP ${mktRes.status}`);
+
+    const mktData    = await mktRes.json();
+    const alertData  = await alertRes.json();
+    const statusData = await statusRes.json();
+
+    // Agrupar por bucket
+    const grouped = { SEGURA: [], CINCUENTA: [], NO_NO: [] };
+    (mktData.markets || []).forEach(m => {
+      if (grouped[m.bucket]) grouped[m.bucket].push(m);
+    });
+    markets = grouped;
+
+    // Actualizar header
+    setConnected(true);
+    document.getElementById('model-status').textContent =
+      statusData.model_ready ? `v${statusData.model_version || '?'} ACTIVO` : 'HEURISTICO';
+    document.getElementById('last-update').textContent =
+      relTime(statusData.last_update);
+
+    renderBoard();
+    renderAlerts(alertData.alerts || []);
+    renderTicker(markets, alertData.alerts || []);
+    processNewAlerts(alertData.alerts || []);
+
+    document.getElementById('error-banner').style.display = 'none';
+
+  } catch (err) {
+    setConnected(false);
+    document.getElementById('error-banner').style.display = 'block';
+    console.warn('API error:', err);
+  }
+}
+
+function setConnected(ok) {
+  connected = ok;
+  const pulse = document.getElementById('pulse');
+  const text  = document.getElementById('status-text');
+  pulse.className = ok ? 'pulse' : 'pulse offline';
+  text.textContent = ok ? 'EN LINEA' : 'SIN CONEXION';
+}
+
+// ── Countdown ─────────────────────────────────────────────────────
+
+setInterval(() => {
+  countdown--;
+  document.getElementById('countdown').textContent = countdown + 's';
+  if (countdown <= 0) {
+    countdown = REFRESH_S;
+    fetchAll();
+  }
+}, 1000);
+
+// ── Init ──────────────────────────────────────────────────────────
+
+fetchAll();
+</script>
+</body>
+</html>

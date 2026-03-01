@@ -1,0 +1,3 @@
+2026-02-28 11:45:01,737 [BACKTEST] Ejecutando backtest...
+2026-02-28 11:45:01,858 [BACKTEST] Dataset: 15958 total | 259 resueltos con label real
+2026-02-28 11:45:03,164 [BACKTEST] Informe guardado: C:\Repos\Plymarket\backtest_report.html

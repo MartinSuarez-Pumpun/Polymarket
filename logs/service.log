@@ -1,0 +1,197 @@
+2026-02-27 17:29:20,208 [SERVICE] Inference loop arrancado
+2026-02-27 17:29:20,208 [SERVICE] Servicio arrancado — inference loop en background
+2026-02-27 17:29:20,209 [SERVICE] Cargando modelo xgb: models\model.xgb.json
+2026-02-27 17:29:21,429 [SERVICE] Modelo listo (xgb) hash=69988198
+2026-02-27 17:29:55,478 [SERVICE] Ciclo OK: 100 mercados | S=62 C=3 N=35
+2026-02-27 17:31:29,421 [SERVICE] Ciclo OK: 100 mercados | S=62 C=3 N=35
+2026-02-27 17:33:03,380 [SERVICE] Ciclo OK: 100 mercados | S=62 C=3 N=35
+2026-02-27 17:34:37,136 [SERVICE] Ciclo OK: 100 mercados | S=62 C=2 N=36
+2026-02-27 17:34:53,715 [SERVICE] Inference loop arrancado
+2026-02-27 17:34:53,716 [SERVICE] Servicio arrancado — inference loop en background
+2026-02-27 17:34:53,716 [SERVICE] Cargando modelo xgb: models\model.xgb.json
+2026-02-27 17:34:54,902 [SERVICE] Modelo listo (xgb) hash=69988198
+2026-02-27 17:35:28,594 [SERVICE] Ciclo OK: 100 mercados | S=62 C=2 N=36
+2026-02-27 17:37:02,297 [SERVICE] Ciclo OK: 100 mercados | S=64 C=3 N=33
+2026-02-27 17:38:49,502 [SERVICE] Inference loop arrancado
+2026-02-27 17:38:49,502 [SERVICE] Servicio arrancado — inference loop en background
+2026-02-27 17:38:49,503 [SERVICE] Cargando modelo xgb: models\model.xgb.json
+2026-02-27 17:38:50,672 [SERVICE] Modelo listo (xgb) hash=69988198
+2026-02-27 17:39:24,655 [SERVICE] Ciclo OK: 100 mercados | S=64 C=3 N=33
+2026-02-27 17:40:58,923 [SERVICE] Ciclo OK: 100 mercados | S=65 C=2 N=33
+2026-02-27 17:42:34,326 [SERVICE] Ciclo OK: 100 mercados | S=65 C=2 N=33
+2026-02-27 17:43:58,349 [SERVICE] Inference loop arrancado
+2026-02-27 17:43:58,349 [SERVICE] Servicio arrancado — inference loop en background
+2026-02-27 17:43:58,752 [SERVICE] Cargando modelo xgb: models\model.xgb.json
+2026-02-27 17:44:00,079 [SERVICE] Modelo listo (xgb) hash=69988198
+2026-02-27 17:44:33,680 [SERVICE] Ciclo OK: 100 mercados | S=65 C=1 N=34
+2026-02-27 17:46:08,057 [SERVICE] Ciclo OK: 100 mercados | S=64 C=1 N=35
+2026-02-27 17:47:41,431 [SERVICE] Ciclo OK: 100 mercados | S=64 C=1 N=35
+2026-02-27 17:47:57,993 [SERVICE] Inference loop arrancado
+2026-02-27 17:47:57,993 [SERVICE] Servicio arrancado — inference loop en background
+2026-02-27 17:47:58,191 [SERVICE] Cargando modelo xgb: models\model.xgb.json
+2026-02-27 17:47:59,485 [SERVICE] Modelo listo (xgb) hash=69988198
+2026-02-27 17:48:12,256 [SERVICE] Ciclo OK: 100 mercados | S=64 C=1 N=35
+2026-02-27 17:49:24,865 [SERVICE] Ciclo OK: 100 mercados | S=65 C=1 N=34
+2026-02-27 17:50:37,156 [SERVICE] Ciclo OK: 100 mercados | S=65 C=1 N=34
+2026-02-27 17:51:49,578 [SERVICE] Ciclo OK: 100 mercados | S=65 C=3 N=32
+2026-02-27 17:55:58,860 [SERVICE] Inference loop arrancado
+2026-02-27 17:55:58,861 [SERVICE] Servicio arrancado — inference loop en background
+2026-02-27 17:55:59,050 [SERVICE] Cargando modelo xgb: models\model.xgb.json
+2026-02-27 17:56:00,308 [SERVICE] Modelo listo (xgb) hash=b75b33da
+2026-02-27 17:56:12,748 [SERVICE] Ciclo OK: 100 mercados | S=0 C=0 N=100
+2026-02-27 17:57:25,616 [SERVICE] Ciclo OK: 100 mercados | S=0 C=0 N=100
+2026-02-27 17:58:38,050 [SERVICE] Ciclo OK: 100 mercados | S=0 C=0 N=100
+2026-02-27 17:59:50,738 [SERVICE] Ciclo OK: 100 mercados | S=0 C=0 N=100
+2026-02-27 18:01:03,765 [SERVICE] Ciclo OK: 100 mercados | S=0 C=0 N=100
+2026-02-27 18:02:16,686 [SERVICE] Ciclo OK: 100 mercados | S=0 C=0 N=100
+2026-02-27 18:03:29,337 [SERVICE] Ciclo OK: 100 mercados | S=0 C=0 N=100
+2026-02-27 18:04:42,149 [SERVICE] Ciclo OK: 100 mercados | S=0 C=0 N=100
+2026-02-27 18:05:54,816 [SERVICE] Ciclo OK: 100 mercados | S=0 C=0 N=100
+2026-02-27 18:07:07,365 [SERVICE] Ciclo OK: 100 mercados | S=0 C=0 N=100
+2026-02-27 18:08:19,866 [SERVICE] Ciclo OK: 100 mercados | S=0 C=0 N=100
+2026-02-27 18:09:32,628 [SERVICE] Ciclo OK: 100 mercados | S=0 C=0 N=100
+2026-02-27 18:10:45,177 [SERVICE] Ciclo OK: 100 mercados | S=0 C=0 N=100
+2026-02-27 18:11:57,534 [SERVICE] Ciclo OK: 100 mercados | S=0 C=0 N=100
+2026-02-27 18:13:10,131 [SERVICE] Ciclo OK: 100 mercados | S=0 C=0 N=100
+2026-02-27 18:14:22,663 [SERVICE] Ciclo OK: 100 mercados | S=0 C=0 N=100
+2026-02-27 18:15:35,329 [SERVICE] Ciclo OK: 100 mercados | S=0 C=0 N=100
+2026-02-27 18:16:47,738 [SERVICE] Ciclo OK: 100 mercados | S=0 C=0 N=100
+2026-02-27 18:17:47,739 [SERVICE] Cargando modelo xgb: models\model.xgb.json
+2026-02-27 18:17:47,745 [SERVICE] Modelo listo (xgb) hash=74783e84
+2026-02-27 18:18:00,138 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 18:19:12,565 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 18:20:24,932 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 18:21:37,383 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 18:22:49,726 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 18:24:02,061 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 18:25:14,458 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 18:26:26,879 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 18:27:39,229 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 18:28:52,139 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 18:30:04,724 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 18:31:17,027 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 18:32:29,426 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 18:33:41,764 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 18:34:54,233 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 18:36:06,539 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 18:37:18,832 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 18:38:31,422 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 18:39:43,720 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 18:40:56,133 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 18:42:08,385 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 18:43:20,770 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 18:44:33,296 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 18:45:45,374 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 18:46:57,904 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 18:48:10,388 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 18:49:22,541 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 18:50:34,923 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 18:51:48,898 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 18:53:01,370 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 18:54:14,255 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 18:55:26,609 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 18:56:38,957 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 18:57:51,915 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 18:59:04,380 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 19:00:16,589 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 19:01:28,929 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 19:02:41,909 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 19:03:54,866 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 19:05:07,231 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 19:06:19,996 [SERVICE] Ciclo OK: 100 mercados | S=100 C=0 N=0
+2026-02-27 19:06:40,324 [SERVICE] Inference loop arrancado
+2026-02-27 19:06:40,324 [SERVICE] Servicio arrancado — inference loop en background
+2026-02-27 19:23:26,779 [SERVICE] Ciclo OK: 7954 mercados | S=28 C=1246 N=6680
+2026-02-27 19:41:12,329 [SERVICE] Ciclo OK: 7982 mercados | S=28 C=1230 N=6724
+2026-02-27 19:42:12,330 [SERVICE] Cargando modelo xgb: models\model.xgb.json
+2026-02-27 19:42:13,860 [SERVICE] Modelo listo (xgb) hash=3b31d93e
+2026-02-27 19:59:03,996 [SERVICE] Ciclo OK: 8005 mercados | S=471 C=11 N=7523
+2026-02-27 20:16:58,400 [SERVICE] Ciclo OK: 8021 mercados | S=477 C=8 N=7536
+2026-02-27 20:35:07,138 [SERVICE] Ciclo OK: 8047 mercados | S=485 C=6 N=7556
+2026-02-27 20:53:20,325 [SERVICE] Ciclo OK: 8057 mercados | S=475 C=6 N=7576
+2026-02-27 21:10:31,443 [SERVICE] Inference loop arrancado
+2026-02-27 21:10:31,443 [SERVICE] Servicio arrancado
+2026-02-27 21:10:31,651 [SERVICE] Cargando modelo: models\model.xgb.json
+2026-02-27 21:10:32,949 [SERVICE] Modelo listo hash=3b31d93e
+2026-02-27 21:15:48,080 [SERVICE] Ciclo OK: 2400 eventos (de 8051 markets) | S=501 C=226 N=1673
+2026-02-27 21:22:01,245 [SERVICE] Ciclo OK: 2402 eventos (de 8063 markets) | S=507 C=227 N=1668
+2026-02-27 21:23:01,245 [SERVICE] Cargando modelo: models\model.xgb.json
+2026-02-27 21:23:01,293 [SERVICE] Modelo listo hash=6f1a6caf
+2026-02-27 21:28:16,313 [SERVICE] Ciclo OK: 2401 eventos (de 8068 markets) | S=544 C=211 N=1646
+2026-02-27 21:34:34,662 [SERVICE] Ciclo OK: 2399 eventos (de 8066 markets) | S=537 C=218 N=1644
+2026-02-27 21:41:01,799 [SERVICE] Ciclo OK: 2398 eventos (de 8068 markets) | S=539 C=215 N=1644
+2026-02-27 21:47:11,866 [SERVICE] Ciclo OK: 2393 eventos (de 8068 markets) | S=537 C=214 N=1642
+2026-02-27 21:53:18,546 [SERVICE] Ciclo OK: 2402 eventos (de 8076 markets) | S=540 C=207 N=1655
+2026-02-27 21:59:22,860 [SERVICE] Ciclo OK: 2401 eventos (de 8072 markets) | S=541 C=205 N=1655
+2026-02-27 22:05:22,276 [SERVICE] Ciclo OK: 2401 eventos (de 8071 markets) | S=542 C=207 N=1652
+2026-02-27 22:11:26,215 [SERVICE] Ciclo OK: 2394 eventos (de 8076 markets) | S=543 C=205 N=1646
+2026-02-27 22:17:25,156 [SERVICE] Ciclo OK: 2394 eventos (de 8082 markets) | S=546 C=204 N=1644
+2026-02-27 22:23:24,405 [SERVICE] Ciclo OK: 2393 eventos (de 8085 markets) | S=544 C=205 N=1644
+2026-02-27 22:29:22,049 [SERVICE] Ciclo OK: 2380 eventos (de 8092 markets) | S=542 C=211 N=1627
+2026-02-27 22:35:20,069 [SERVICE] Ciclo OK: 2385 eventos (de 8082 markets) | S=545 C=215 N=1625
+2026-02-27 22:41:33,494 [SERVICE] Ciclo OK: 2386 eventos (de 8089 markets) | S=547 C=214 N=1625
+2026-02-27 22:47:45,508 [SERVICE] Ciclo OK: 2389 eventos (de 8094 markets) | S=545 C=208 N=1636
+2026-02-28 11:29:55,231 [SERVICE] Inference loop arrancado
+2026-02-28 11:29:55,231 [SERVICE] Servicio arrancado
+2026-02-28 11:29:55,421 [SERVICE] Cargando modelo: models\model.xgb.json
+2026-02-28 11:29:56,761 [SERVICE] Modelo listo hash=4057c0c1
+2026-02-28 11:30:48,125 [SERVICE] Inference loop arrancado
+2026-02-28 11:30:48,125 [SERVICE] Servicio arrancado
+2026-02-28 11:30:48,395 [SERVICE] Cargando modelo: models\model.xgb.json
+2026-02-28 11:30:49,653 [SERVICE] Modelo listo hash=4057c0c1
+2026-02-28 11:35:04,446 [SERVICE] Inference loop arrancado
+2026-02-28 11:35:04,446 [SERVICE] Servicio arrancado
+2026-02-28 11:35:04,705 [SERVICE] Cargando modelo: models\model.xgb.json
+2026-02-28 11:35:06,035 [SERVICE] Modelo listo hash=4057c0c1
+2026-02-28 11:40:05,970 [SERVICE] Ciclo OK: 2313 eventos (de 7648 markets) | S=446 C=252 N=1615
+2026-02-28 11:46:05,802 [SERVICE] Ciclo OK: 2317 eventos (de 7650 markets) | S=447 C=252 N=1618
+2026-02-28 11:52:05,931 [SERVICE] Ciclo OK: 2320 eventos (de 7658 markets) | S=449 C=250 N=1621
+2026-02-28 11:53:50,900 [SERVICE] Inference loop arrancado
+2026-02-28 11:53:50,900 [SERVICE] Servicio arrancado
+2026-02-28 11:53:51,171 [SERVICE] Cargando modelo: models\model.xgb.json
+2026-02-28 11:53:52,523 [SERVICE] Modelo listo hash=4057c0c1
+2026-02-28 11:58:50,079 [SERVICE] Ciclo OK: 2319 eventos (de 7666 markets) | S=106 C=218 N=1995
+2026-02-28 12:04:51,005 [SERVICE] Ciclo OK: 2322 eventos (de 7671 markets) | S=105 C=211 N=2006
+2026-02-28 12:11:06,517 [SERVICE] Ciclo OK: 2324 eventos (de 7680 markets) | S=106 C=212 N=2006
+2026-02-28 12:17:18,312 [SERVICE] Ciclo OK: 2327 eventos (de 7695 markets) | S=106 C=216 N=2005
+2026-02-28 12:23:23,110 [SERVICE] Ciclo OK: 2327 eventos (de 7701 markets) | S=106 C=219 N=2002
+2026-02-28 12:29:24,542 [SERVICE] Ciclo OK: 2325 eventos (de 7700 markets) | S=108 C=219 N=1998
+2026-02-28 12:35:27,979 [SERVICE] Ciclo OK: 2331 eventos (de 7704 markets) | S=110 C=215 N=2006
+2026-02-28 12:41:32,071 [SERVICE] Ciclo OK: 2330 eventos (de 7715 markets) | S=109 C=219 N=2002
+2026-02-28 12:47:31,513 [SERVICE] Ciclo OK: 2321 eventos (de 7701 markets) | S=103 C=217 N=2001
+2026-02-28 12:53:32,955 [SERVICE] Ciclo OK: 2324 eventos (de 7706 markets) | S=106 C=219 N=1999
+2026-02-28 12:59:38,852 [SERVICE] Ciclo OK: 2326 eventos (de 7710 markets) | S=105 C=217 N=2004
+2026-02-28 13:05:40,349 [SERVICE] Ciclo OK: 2327 eventos (de 7708 markets) | S=107 C=213 N=2007
+2026-02-28 13:11:40,861 [SERVICE] Ciclo OK: 2327 eventos (de 7710 markets) | S=107 C=212 N=2008
+2026-02-28 13:17:42,182 [SERVICE] Ciclo OK: 2327 eventos (de 7712 markets) | S=107 C=201 N=2019
+2026-02-28 13:23:43,429 [SERVICE] Ciclo OK: 2317 eventos (de 7692 markets) | S=105 C=203 N=2009
+2026-02-28 13:29:43,667 [SERVICE] Ciclo OK: 2328 eventos (de 7713 markets) | S=110 C=198 N=2020
+2026-02-28 13:35:41,397 [SERVICE] Ciclo OK: 2330 eventos (de 7721 markets) | S=108 C=205 N=2017
+2026-02-28 13:41:42,900 [SERVICE] Ciclo OK: 2332 eventos (de 7726 markets) | S=107 C=208 N=2017
+2026-02-28 13:47:46,067 [SERVICE] Ciclo OK: 2333 eventos (de 7726 markets) | S=108 C=199 N=2026
+2026-02-28 13:53:47,024 [SERVICE] Ciclo OK: 2335 eventos (de 7734 markets) | S=108 C=203 N=2024
+2026-02-28 13:59:48,336 [SERVICE] Ciclo OK: 2336 eventos (de 7736 markets) | S=106 C=201 N=2029
+2026-02-28 14:05:49,619 [SERVICE] Ciclo OK: 2343 eventos (de 7739 markets) | S=107 C=204 N=2032
+2026-02-28 14:11:47,657 [SERVICE] Ciclo OK: 2338 eventos (de 7739 markets) | S=103 C=204 N=2031
+2026-02-28 14:18:05,106 [SERVICE] Ciclo OK: 2353 eventos (de 7740 markets) | S=103 C=200 N=2050
+2026-02-28 14:24:20,041 [SERVICE] Ciclo OK: 2353 eventos (de 7732 markets) | S=106 C=199 N=2048
+2026-02-28 14:30:23,070 [SERVICE] Ciclo OK: 2355 eventos (de 7737 markets) | S=107 C=199 N=2049
+2026-02-28 14:36:20,984 [SERVICE] Ciclo OK: 2357 eventos (de 7741 markets) | S=103 C=195 N=2059
+2026-02-28 14:42:17,160 [SERVICE] Ciclo OK: 2348 eventos (de 7747 markets) | S=105 C=197 N=2046
+2026-02-28 14:48:17,488 [SERVICE] Ciclo OK: 2359 eventos (de 7755 markets) | S=108 C=196 N=2055
+2026-02-28 14:54:14,139 [SERVICE] Ciclo OK: 2358 eventos (de 7756 markets) | S=110 C=195 N=2053
+2026-02-28 15:00:13,125 [SERVICE] Ciclo OK: 2362 eventos (de 7762 markets) | S=111 C=198 N=2053
+2026-02-28 15:06:21,572 [SERVICE] Ciclo OK: 2367 eventos (de 7774 markets) | S=110 C=201 N=2056
+2026-02-28 15:12:57,317 [SERVICE] Ciclo OK: 2366 eventos (de 7781 markets) | S=109 C=201 N=2056
+2026-02-28 15:19:16,250 [SERVICE] Ciclo OK: 2370 eventos (de 7782 markets) | S=104 C=208 N=2058
+2026-02-28 15:25:13,596 [SERVICE] Ciclo OK: 2371 eventos (de 7793 markets) | S=91 C=199 N=2081
+2026-02-28 15:31:19,891 [SERVICE] Ciclo OK: 2372 eventos (de 7796 markets) | S=97 C=198 N=2077
+2026-02-28 15:37:31,049 [SERVICE] Ciclo OK: 2372 eventos (de 7801 markets) | S=103 C=205 N=2064
+2026-02-28 15:43:46,761 [SERVICE] Ciclo OK: 2373 eventos (de 7810 markets) | S=102 C=196 N=2075
+2026-02-28 15:50:03,153 [SERVICE] Ciclo OK: 2376 eventos (de 7819 markets) | S=99 C=200 N=2077
+2026-02-28 15:56:14,633 [SERVICE] Ciclo OK: 2376 eventos (de 7826 markets) | S=100 C=197 N=2079
+2026-02-28 16:02:17,802 [SERVICE] Ciclo OK: 2374 eventos (de 7834 markets) | S=88 C=196 N=2090
+2026-02-28 16:08:20,992 [SERVICE] Ciclo OK: 2376 eventos (de 7828 markets) | S=94 C=202 N=2080
+2026-02-28 16:14:24,653 [SERVICE] Ciclo OK: 2377 eventos (de 7834 markets) | S=86 C=199 N=2092
+2026-02-28 16:20:28,353 [SERVICE] Ciclo OK: 2380 eventos (de 7850 markets) | S=87 C=198 N=2095
+2026-02-28 16:26:34,399 [SERVICE] Ciclo OK: 2381 eventos (de 7863 markets) | S=88 C=192 N=2101

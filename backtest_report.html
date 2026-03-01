@@ -1,0 +1,3106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>POLYMARKET // BACKTEST REPORT</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:    #07090d;
+    --bg2:   #0d1117;
+    --bg3:   #111820;
+    --line:  #1a2535;
+    --text:  #b8c8d8;
+    --dim:   #3a4a5a;
+    --green: #00e676;
+    --yellow:#ffd600;
+    --red:   #ff1744;
+    --blue:  #00b0ff;
+    --mono:  'IBM Plex Mono', monospace;
+    --sans:  'IBM Plex Sans', sans-serif;
+  }
+  body { background: var(--bg); color: var(--text); font-family: var(--mono); min-height: 100vh; }
+
+  header {
+    padding: 2rem 3rem 1.5rem;
+    border-bottom: 1px solid var(--line);
+    display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+  }
+  .logo { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.02em; }
+  .logo span { color: var(--blue); }
+  .meta { font-size: 0.65rem; color: var(--dim); text-align: right; line-height: 1.8; }
+  .meta strong { color: var(--text); }
+
+  main { padding: 2rem 3rem; max-width: 1400px; }
+
+  h2 { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.2em; color: var(--dim);
+        text-transform: uppercase; margin: 2rem 0 1rem; border-left: 2px solid var(--blue);
+        padding-left: 0.75rem; }
+
+  /* ── Summary bar ── */
+  .summary {
+    display: flex; gap: 0; border: 1px solid var(--line); border-radius: 4px;
+    overflow: hidden; margin-bottom: 2rem;
+  }
+  .sum-item { flex: 1; padding: 1rem 1.5rem; border-right: 1px solid var(--line); }
+  .sum-item:last-child { border-right: none; }
+  .sum-label { font-size: 0.55rem; color: var(--dim); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.3rem; }
+  .sum-value { font-size: 1.6rem; font-weight: 700; }
+  .sum-value.green  { color: var(--green); }
+  .sum-value.yellow { color: var(--yellow); }
+  .sum-value.blue   { color: var(--blue); }
+
+  /* ── Stat cards ── */
+  .stat-cards { display: flex; gap: 1.5rem; margin-bottom: 2rem; flex-wrap: wrap; }
+  .stat-card {
+    flex: 1; min-width: 200px; padding: 1.5rem;
+    border: 1px solid var(--line); border-radius: 4px; background: var(--bg2);
+  }
+  .stat-bucket { font-size: 0.55rem; letter-spacing: 0.18em; font-weight: 700; margin-bottom: 0.5rem; }
+  .stat-bucket.green  { color: var(--green); }
+  .stat-bucket.yellow { color: var(--yellow); }
+  .stat-bucket.red    { color: var(--red); }
+  .stat-acc { font-size: 2.2rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .stat-bar-wrap { height: 3px; background: var(--line); border-radius: 2px; margin-bottom: 0.5rem; }
+  .stat-bar { height: 100%; border-radius: 2px; }
+  .stat-bar.green  { background: var(--green); }
+  .stat-bar.yellow { background: var(--yellow); }
+  .stat-bar.red    { background: var(--red); }
+  .stat-detail { font-size: 0.60rem; color: var(--dim); }
+
+  /* ── Calibration ── */
+  .cal-wrap {
+    display: flex; align-items: flex-end; gap: 4px; height: 120px;
+    padding: 0 1rem 2rem; border: 1px solid var(--line); border-radius: 4px;
+    background: var(--bg2); position: relative; margin-bottom: 2rem; overflow-x: auto;
+  }
+  .cal-col { position: relative; display: flex; flex-direction: column; align-items: center; width: 60px; flex-shrink: 0; }
+  .cal-actual { width: 40px; border-radius: 2px 2px 0 0; min-height: 2px; }
+  .cal-ok    { background: var(--green); opacity: 0.8; }
+  .cal-over  { background: var(--blue); opacity: 0.8; }
+  .cal-under { background: var(--red); opacity: 0.8; }
+  .cal-pred-line {
+    position: absolute; left: 8px; right: 8px; height: 2px;
+    background: var(--yellow); opacity: 0.6; bottom: 0;
+  }
+  .cal-label { font-size: 0.45rem; color: var(--dim); margin-top: 4px; white-space: nowrap; }
+  .cal-n     { font-size: 0.40rem; color: var(--dim); }
+  .cal-legend { font-size: 0.55rem; color: var(--dim); margin-bottom: 0.5rem; }
+  .cal-legend span { display: inline-block; width: 10px; height: 10px; border-radius: 1px; margin-right: 4px; vertical-align: middle; }
+
+  /* ── Table ── */
+  .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 4px; margin-bottom: 3rem; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.62rem; }
+  thead th {
+    padding: 0.6rem 0.8rem; text-align: left; background: var(--bg3);
+    color: var(--dim); font-size: 0.50rem; letter-spacing: 0.15em; text-transform: uppercase;
+    border-bottom: 1px solid var(--line); white-space: nowrap;
+  }
+  tbody tr { border-bottom: 1px solid var(--line); transition: background 0.1s; }
+  tbody tr:hover { background: var(--bg3); }
+  tbody tr:last-child { border-bottom: none; }
+  td { padding: 0.5rem 0.8rem; vertical-align: middle; }
+
+  .q-link { color: var(--text); text-decoration: none; }
+  .q-link:hover { color: var(--blue); }
+  .cat { font-size: 0.50rem; color: var(--dim); }
+  .dim { color: var(--dim); }
+
+  .prob-segura   { color: var(--green); }
+  .prob-cincuenta{ color: var(--yellow); }
+  .prob-nono     { color: var(--red); }
+
+  .bucket-tag { font-size: 0.48rem; font-weight: 700; letter-spacing: 0.1em; padding: 2px 6px; border-radius: 2px; }
+  .bucket-tag.segura    { background: rgba(0,230,118,0.12); color: var(--green); }
+  .bucket-tag.cincuenta { background: rgba(255,214,0,0.12);  color: var(--yellow); }
+  .bucket-tag.nono      { background: rgba(255,23,68,0.12);  color: var(--red); }
+
+  .res-yes { color: var(--green); font-weight: 600; }
+  .res-no  { color: var(--red);   font-weight: 600; }
+
+  .verdict { font-size: 0.9rem; font-weight: 700; }
+  .verdict.hit  { color: var(--green); }
+  .verdict.miss { color: var(--red); }
+  .verdict.skip { color: var(--dim); }
+
+  .real-badge { font-size: 0.48rem; padding: 1px 4px; border-radius: 2px; font-weight: 700; }
+  .real-badge.real { background: rgba(0,176,255,0.15); color: var(--blue); }
+  .real-badge.heur { background: var(--line); color: var(--dim); }
+
+  /* ── Filter bar ── */
+  .filters { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+  .filter-btn {
+    background: none; border: 1px solid var(--line); border-radius: 2px;
+    padding: 4px 12px; color: var(--dim); font-family: var(--mono); font-size: 0.55rem;
+    cursor: pointer; transition: all 0.15s; letter-spacing: 0.1em;
+  }
+  .filter-btn:hover { border-color: var(--blue); color: var(--blue); }
+  .filter-btn.active { border-color: var(--blue); color: var(--blue); background: rgba(0,176,255,0.08); }
+  .filter-btn.green.active  { border-color: var(--green); color: var(--green); background: rgba(0,230,118,0.08); }
+  .filter-btn.yellow.active { border-color: var(--yellow); color: var(--yellow); background: rgba(255,214,0,0.08); }
+  .filter-btn.red.active    { border-color: var(--red); color: var(--red); background: rgba(255,23,68,0.08); }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">POLYMARKET <span>//</span> BACKTEST</div>
+  <div class="meta">
+    Generado: <strong>2026-02-28 11:45</strong><br>
+    Mercados analizados: <strong>259</strong> · Con label real: <strong>259</strong>
+  </div>
+</header>
+<main>
+
+  <div class="summary">
+    <div class="sum-item"><div class="sum-label">Accuracy global</div><div class="sum-value blue">51%</div></div>
+    <div class="sum-item"><div class="sum-label">Predicciones correctas</div><div class="sum-value green">131</div></div>
+    <div class="sum-item"><div class="sum-label">Predicciones incorrectas</div><div class="sum-value" style="color:var(--red)">128</div></div>
+    <div class="sum-item"><div class="sum-label">Inconclusos (50/50)</div><div class="sum-value yellow">0</div></div>
+    <div class="sum-item"><div class="sum-label">Labels reales vs heurísticos</div><div class="sum-value" style="font-size:1rem;padding-top:0.3rem">259 <span style="color:var(--dim)">/ 259</span></div></div>
+  </div>
+
+  <h2>accuracy por bucket</h2>
+  <div class="stat-cards">
+        <div class="stat-card">
+          <div class="stat-bucket green">APUESTA SEGURA</div>
+          <div class="stat-acc">100%</div>
+          <div class="stat-bar-wrap"><div class="stat-bar green" style="width:100%"></div></div>
+          <div class="stat-detail">2/2 correctos · 2 total</div>
+        </div><div class="stat-card"><div class="stat-bucket yellow">50 / 50</div><div class="stat-n">0 mercados</div></div>
+        <div class="stat-card">
+          <div class="stat-bucket red">NO NO</div>
+          <div class="stat-acc">50%</div>
+          <div class="stat-bar-wrap"><div class="stat-bar red" style="width:50%"></div></div>
+          <div class="stat-detail">129/257 correctos · 257 total</div>
+        </div></div>
+
+  <h2>calibración — predicho vs real</h2>
+  <div class="cal-legend">
+    <span style="background:var(--green)"></span>bien calibrado &nbsp;
+    <span style="background:var(--blue)"></span>sobreestima &nbsp;
+    <span style="background:var(--red)"></span>subestima &nbsp;
+    <span style="background:var(--yellow)"></span>predicho (línea)
+  </div>
+  <div class="cal-wrap">
+        <div class="cal-col">
+          <div class="cal-actual cal-over" style="height:49px" title="0-10%: actual=50% pred=5% n=257"></div>
+          <div class="cal-pred-line" style="bottom:5px"></div>
+          <div class="cal-label">0-10%</div>
+          <div class="cal-n">n=257</div>
+        </div>
+        <div class="cal-col">
+          <div class="cal-actual cal-over" style="height:100px" title="70-80%: actual=100% pred=75% n=2"></div>
+          <div class="cal-pred-line" style="bottom:75px"></div>
+          <div class="cal-label">70-80%</div>
+          <div class="cal-n">n=2</div>
+        </div></div>
+
+  <h2>detalle de mercados resueltos</h2>
+  <div class="filters">
+    <button class="filter-btn active" onclick="filterTable('ALL', this)">TODOS</button>
+    <button class="filter-btn green"  onclick="filterTable('SEGURA', this)">APUESTA SEGURA</button>
+    <button class="filter-btn yellow" onclick="filterTable('CINCUENTA', this)">50/50</button>
+    <button class="filter-btn red"    onclick="filterTable('NO_NO', this)">NO NO</button>
+    <button class="filter-btn"        onclick="filterTable('HIT', this)">✓ CORRECTOS</button>
+    <button class="filter-btn"        onclick="filterTable('MISS', this)">✗ INCORRECTOS</button>
+    <button class="filter-btn"        onclick="filterTable('REAL', this)">★ LABEL REAL</button>
+  </div>
+  <div class="table-wrap">
+    <table id="main-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Mercado</th>
+          <th>Categoría</th>
+          <th>Prob</th>
+          <th>Bucket</th>
+          <th>Precio YES</th>
+          <th>Resolvió</th>
+          <th>¿Acertó?</th>
+          <th>Fecha</th>
+        </tr>
+      </thead>
+      <tbody id="table-body">
+        
+        <tr class="row-segura">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/trump-margin-of-victory-in-new-hampshire-primary" target="_blank" class="q-link">Trump margin of victory in New Hampshire Primary 0-2.5%</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-segura">73%</strong></td>
+          <td><span class="bucket-tag segura">SEGURA</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-segura">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/trump-margin-of-victory-in-new-hampshire-primary" target="_blank" class="q-link">Trump margin of victory in New Hampshire Primary 0-2.5%</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-segura">73%</strong></td>
+          <td><span class="bucket-tag segura">SEGURA</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/nba-champion-2024-2025" target="_blank" class="q-link">Will the Milwaukee Bucks win the 2025 NBA Finals?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">1%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/what-price-will-ethereum-hit-in-2025" target="_blank" class="q-link">Will Ethereum hit $6,000 by December 31?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">1%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/nba-champion-2024-2025" target="_blank" class="q-link">Will the Milwaukee Bucks win the 2025 NBA Finals?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">1%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/what-price-will-ethereum-hit-in-2025" target="_blank" class="q-link">Will Ethereum hit $6,000 by December 31?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">1%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/bitcoin-above-on-february-13" target="_blank" class="q-link">Will the price of Bitcoin be above $72,000 on February 13?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/elon-musk-of-tweets-february-14-february-16" target="_blank" class="q-link">Will Elon Musk post 90-114 tweets from February 14 to February 16, 2026?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/ucl-int2-bog1-2026-02-24" target="_blank" class="q-link">Will FC Internazionale Milano win on 2026-02-24?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/elon-musk-of-tweets-november-11-november-18" target="_blank" class="q-link">Will Elon Musk post 280-299 tweets from November 11 to November 18, 2025?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/ufc-320-ankalaev-vs-pereira-2" target="_blank" class="q-link">Dvalishvili vs. Sandhagen</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/new-mexico-presidential-election-winner-2024" target="_blank" class="q-link">Will a candidate from another party win New Mexico Presidential Election?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/cbb-lamar-no-2026-01-19" target="_blank" class="q-link">Lamar Cardinals vs. New Orleans Privateers</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/mlb-hou-tor-2025-09-11" target="_blank" class="q-link">Astros vs. Blue Jays</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/bitcoin-above-on-february-13" target="_blank" class="q-link">Will the price of Bitcoin be above $72,000 on February 13?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/elon-musk-of-tweets-february-14-february-16" target="_blank" class="q-link">Will Elon Musk post 90-114 tweets from February 14 to February 16, 2026?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/ucl-int2-bog1-2026-02-24" target="_blank" class="q-link">Will FC Internazionale Milano win on 2026-02-24?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/elon-musk-of-tweets-november-11-november-18" target="_blank" class="q-link">Will Elon Musk post 280-299 tweets from November 11 to November 18, 2025?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/ufc-320-ankalaev-vs-pereira-2" target="_blank" class="q-link">Dvalishvili vs. Sandhagen</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/new-mexico-presidential-election-winner-2024" target="_blank" class="q-link">Will a candidate from another party win New Mexico Presidential Election?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/cbb-lamar-no-2026-01-19" target="_blank" class="q-link">Lamar Cardinals vs. New Orleans Privateers</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/mlb-hou-tor-2025-09-11" target="_blank" class="q-link">Astros vs. Blue Jays</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/nba-mar30-2022" target="_blank" class="q-link">NBA: Will the Suns beat the Warriors by more than 5.5 points in their March 30 (</a></td>
+          <td><span class="cat">sports</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/highest-temperature-in-london-on-february-25-2026" target="_blank" class="q-link">Will the highest temperature in London be 18°C on February 25?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/who-will-trump-pardon-in-2025" target="_blank" class="q-link">Will Trump pardon Joe Exotic "The Tiger King" in 2025?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/btc-updown-15m-1772086500" target="_blank" class="q-link">Bitcoin Up or Down - February 26, 1:15AM-1:30AM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/will-russia-capture-territory-in-dnipro-oblast-by" target="_blank" class="q-link">Will Russia capture territory in Dnipropetrovsk Oblast by February 28?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/btc-updown-15m-1766935800" target="_blank" class="q-link">Bitcoin Up or Down - December 28, 10:30AM-10:45AM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/epl-mun-ast-2025-05-25" target="_blank" class="q-link">Will Manchester United win on 2025-05-25?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/french-open-svitolina-vs-swiatek" target="_blank" class="q-link">French Open: Svitolina vs. Swiatek</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/cbb-alcst-txs-2026-02-26" target="_blank" class="q-link">Alcorn State Braves vs. Texas Southern Tigers</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/btc-updown-5m-1771579800" target="_blank" class="q-link">Bitcoin Up or Down - February 20, 4:30AM-4:35AM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/mlb-cin-kc-2025-05-28" target="_blank" class="q-link">Reds vs. Royals</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/mlb-atl-mil-2025-06-09" target="_blank" class="q-link">Braves vs. Brewers</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/bitcoin-up-or-down-september-13-6am-et" target="_blank" class="q-link">Bitcoin Up or Down - September 13, 6AM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/bitcoin-price-on-january-26" target="_blank" class="q-link">Will the price of Bitcoin be between $98,000 and $100,000 on January 26?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/superform-fdv-above-one-day-after-launch" target="_blank" class="q-link">Superform FDV above $100M one day after launch?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/nba-bos-nyk-2025-10-24" target="_blank" class="q-link">Spread: Knicks (-4.5)</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/nfl-hou-lac-2025-12-27" target="_blank" class="q-link">Texans vs. Chargers: O/U 39.5</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/btc-updown-5m-1771576800" target="_blank" class="q-link">Bitcoin Up or Down - February 20, 3:40AM-3:45AM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/ethereum-up-or-down-on-january-3" target="_blank" class="q-link">Ethereum Up or Down on January 3?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/ethereum-up-or-down-february-20-3am-et" target="_blank" class="q-link">Ethereum Up or Down - February 20, 3AM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/cbb-msu-iowa-2025-03-06" target="_blank" class="q-link">Michigan State vs. Iowa</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/btc-updown-15m-1771847100" target="_blank" class="q-link">Bitcoin Up or Down - February 23, 6:45AM-7:00AM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/fifa-club-world-cup-palmeiras-vs-al-ahly" target="_blank" class="q-link">Will Palmeiras beat Al Ahly?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/btc-updown-4h-1770930000" target="_blank" class="q-link">Bitcoin Up or Down - February 12, 4:00PM-8:00PM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/eth-updown-15m-1767084300" target="_blank" class="q-link">Ethereum Up or Down - December 30, 3:45AM-4:00AM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/bitcoin-up-or-down-august-31-8pm-et" target="_blank" class="q-link">Bitcoin Up or Down - August 31, 8PM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/btc-updown-15m-1762827300" target="_blank" class="q-link">Bitcoin Up or Down - November 10, 9:15PM-9:30PM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/bitcoin-price-on-december-3" target="_blank" class="q-link">Will the price of Bitcoin be between $88,000 and $90,000 on December 3?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/cbb-vill-prov-2026-01-13" target="_blank" class="q-link">Spread: Villanova Wildcats (-2.5)</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/ucl-ata-bru-2025-09-30" target="_blank" class="q-link">Will Club Brugge win on 2025-09-30?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/aztec-fdv-above-one-day-after-launch" target="_blank" class="q-link">Aztec FDV above $1.5B one day after launch?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/btc-updown-5m-1771617000" target="_blank" class="q-link">Bitcoin Up or Down - February 20, 2:50PM-2:55PM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/mlb-wsh-sf-2025-08-08" target="_blank" class="q-link">Nationals vs. Giants</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/nba-mar30-2022" target="_blank" class="q-link">NBA: Will the Suns beat the Warriors by more than 5.5 points in their March 30 (</a></td>
+          <td><span class="cat">sports</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/highest-temperature-in-london-on-february-25-2026" target="_blank" class="q-link">Will the highest temperature in London be 18°C on February 25?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/who-will-trump-pardon-in-2025" target="_blank" class="q-link">Will Trump pardon Joe Exotic "The Tiger King" in 2025?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/btc-updown-15m-1772086500" target="_blank" class="q-link">Bitcoin Up or Down - February 26, 1:15AM-1:30AM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/will-russia-capture-territory-in-dnipro-oblast-by" target="_blank" class="q-link">Will Russia capture territory in Dnipropetrovsk Oblast by February 28?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/btc-updown-15m-1766935800" target="_blank" class="q-link">Bitcoin Up or Down - December 28, 10:30AM-10:45AM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/epl-mun-ast-2025-05-25" target="_blank" class="q-link">Will Manchester United win on 2025-05-25?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/french-open-svitolina-vs-swiatek" target="_blank" class="q-link">French Open: Svitolina vs. Swiatek</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/cbb-alcst-txs-2026-02-26" target="_blank" class="q-link">Alcorn State Braves vs. Texas Southern Tigers</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/btc-updown-5m-1771579800" target="_blank" class="q-link">Bitcoin Up or Down - February 20, 4:30AM-4:35AM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/mlb-cin-kc-2025-05-28" target="_blank" class="q-link">Reds vs. Royals</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/mlb-atl-mil-2025-06-09" target="_blank" class="q-link">Braves vs. Brewers</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/bitcoin-up-or-down-september-13-6am-et" target="_blank" class="q-link">Bitcoin Up or Down - September 13, 6AM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/bitcoin-price-on-january-26" target="_blank" class="q-link">Will the price of Bitcoin be between $98,000 and $100,000 on January 26?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/superform-fdv-above-one-day-after-launch" target="_blank" class="q-link">Superform FDV above $100M one day after launch?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/nba-bos-nyk-2025-10-24" target="_blank" class="q-link">Spread: Knicks (-4.5)</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/nfl-hou-lac-2025-12-27" target="_blank" class="q-link">Texans vs. Chargers: O/U 39.5</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/btc-updown-5m-1771576800" target="_blank" class="q-link">Bitcoin Up or Down - February 20, 3:40AM-3:45AM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/ethereum-up-or-down-on-january-3" target="_blank" class="q-link">Ethereum Up or Down on January 3?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/ethereum-up-or-down-february-20-3am-et" target="_blank" class="q-link">Ethereum Up or Down - February 20, 3AM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/cbb-msu-iowa-2025-03-06" target="_blank" class="q-link">Michigan State vs. Iowa</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/btc-updown-15m-1771847100" target="_blank" class="q-link">Bitcoin Up or Down - February 23, 6:45AM-7:00AM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/fifa-club-world-cup-palmeiras-vs-al-ahly" target="_blank" class="q-link">Will Palmeiras beat Al Ahly?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/btc-updown-4h-1770930000" target="_blank" class="q-link">Bitcoin Up or Down - February 12, 4:00PM-8:00PM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/eth-updown-15m-1767084300" target="_blank" class="q-link">Ethereum Up or Down - December 30, 3:45AM-4:00AM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/bitcoin-up-or-down-august-31-8pm-et" target="_blank" class="q-link">Bitcoin Up or Down - August 31, 8PM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/btc-updown-15m-1762827300" target="_blank" class="q-link">Bitcoin Up or Down - November 10, 9:15PM-9:30PM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/bitcoin-price-on-december-3" target="_blank" class="q-link">Will the price of Bitcoin be between $88,000 and $90,000 on December 3?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/cbb-vill-prov-2026-01-13" target="_blank" class="q-link">Spread: Villanova Wildcats (-2.5)</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/ucl-ata-bru-2025-09-30" target="_blank" class="q-link">Will Club Brugge win on 2025-09-30?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/aztec-fdv-above-one-day-after-launch" target="_blank" class="q-link">Aztec FDV above $1.5B one day after launch?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/btc-updown-5m-1771617000" target="_blank" class="q-link">Bitcoin Up or Down - February 20, 2:50PM-2:55PM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/cs2-ace1-bbp-2026-01-23" target="_blank" class="q-link">Counter-Strike: Acend vs Bebop (BO3) - CCT Europe Series #14 Play-In Group B</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/atp-lizunov-yoshida-2026-01-24" target="_blank" class="q-link">Set 1 Winner: Lizunova vs Yoshida</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/dota2-4p-pr1-2026-01-10" target="_blank" class="q-link">Series: Most kills?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/dota2-mouz-liquid-2026-02-26" target="_blank" class="q-link">Total Kills Over/Under 56.5 in Game 1?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/ucol-ucr-noa-2025-10-23" target="_blank" class="q-link">Will Universitatea Craiova CS win on 2025-10-23?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/sol-updown-15m-1769156100" target="_blank" class="q-link">Solana Up or Down - January 23, 3:15AM-3:30AM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/united-states-grand-prix-pole-winner" target="_blank" class="q-link">Will Gabriel Bortoleto win the 2025 F1 United States Grand Prix pole?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/what-will-biden-say-during-drop-out-speech" target="_blank" class="q-link">Will Biden say "Old" during drop out speech?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/what-nicknames-will-trump-say-by-february-28" target="_blank" class="q-link">Will Trump say “Sleazebag” by February 28?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/nba-por-sac-2025-12-20" target="_blank" class="q-link">Trail Blazers vs. Kings: O/U 239.5</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/eth-multistrike-4h-1757606400" target="_blank" class="q-link">Will the price of Ethereum be above $4,475 on September 11 at 12PM ET?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/snhl-klo-dav-2026-01-02" target="_blank" class="q-link">SNHL: Kloten Flyers vs. Davos</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/what-will-trump-say-first-during-saudi-pm-events-on-november-18" target="_blank" class="q-link">Will Trump say "Two Weeks" first during Saudi PM events on November 18?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/world-cup-matches" target="_blank" class="q-link">World Cup: Thursday - Will Brazil beat Serbia?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/solana-up-or-down-july-3-9pm-et" target="_blank" class="q-link">Solana Up or Down - July 3, 9PM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/italy-grand-prix-pole-winner" target="_blank" class="q-link">Will Esteban Ocon win the 2025 Italy GP pole?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/eth-updown-15m-1764097200" target="_blank" class="q-link">Ethereum Up or Down - November 25, 2:00PM-2:15PM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/highest-temperature-in-london-on-may-10" target="_blank" class="q-link">Will the highest temperature in London be between 66-67°F on May 10?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/btc-updown-4h-1761148800" target="_blank" class="q-link">Bitcoin Up or Down - October 22, 12:00PM-4:00PM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/winter-games-2026-luge-mens-doubles" target="_blank" class="q-link">Will Bosman/Mick (SVK) win the gold medal for Winter Olympics 2026: Luge - Men's</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/fl1-ogc-ang-2025-12-07-more-markets" target="_blank" class="q-link">Spread: OGC Nice (-1.5)</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/cs2-orm-ff-2025-12-18" target="_blank" class="q-link">Counter-Strike: Oramond vs Fire Flux Esports - Map 2 Winner</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/eth-updown-5m-1772205000" target="_blank" class="q-link">Ethereum Up or Down - February 27, 10:10AM-10:15AM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/xrp-updown-15m-1769845500" target="_blank" class="q-link">XRP Up or Down - January 31, 2:45AM-3:00AM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/cs2-bb3-fokus-2026-02-26" target="_blank" class="q-link">Counter-Strike: BetBoom Team vs FOKUS - Map 2 Winner</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/highest-temperature-in-buenos-aires-on-february-12-2026" target="_blank" class="q-link">Will the highest temperature in Buenos Aires be 30°C on February 12?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/elon-musk-of-tweets-september-7" target="_blank" class="q-link">Will Elon Musk post 40-49 tweets on September 7, 2025?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/who-will-win-super-bowl-lvii" target="_blank" class="q-link">Will the Jacksonville Jaguars win Super Bowl LVII?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/eurobasket-germany-vs-great-britain-2025-09-01" target="_blank" class="q-link">Euro Basket: Germany vs Great Britain</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/xrp-updown-15m-1768409100" target="_blank" class="q-link">XRP Up or Down - January 14, 11:45AM-12:00PM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/btc-multistrike-4h-1758153600" target="_blank" class="q-link">Will the price of Bitcoin be above $116,500 on September 17 at 8PM ET?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/xrp-updown-15m-1761886800" target="_blank" class="q-link">XRP Up or Down - October 31, 1:00AM-1:15AM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/xrp-updown-15m-1770969600" target="_blank" class="q-link">XRP Up or Down - February 13, 3:00AM-3:15AM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/cs2-am-ace1-2026-02-17" target="_blank" class="q-link">Counter-Strike: AM Gaming vs Acend (BO3) - CCT Europe Series #15 Playoffs</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/bun-uni-b04-2026-02-21-more-markets" target="_blank" class="q-link">1. FC Union Berlin vs. Bayer 04 Leverkusen: Both Teams to Score</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/ucl-slovan-bratislava-vs-dinamo-zagreb" target="_blank" class="q-link">Will Slovan Bratislava beat Dinamo Zagreb?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/what-will-trump-say-during-the-announcement-on-february-5" target="_blank" class="q-link">Will Trump say "Big" or "Biggest" or "Bigly" 10+ times during the announcement o</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/lol-vit-mkoi-2026-02-07" target="_blank" class="q-link">Total Kills Over/Under 33.5 in Game 1?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/ethereum-up-or-down-july-6-4pm-et" target="_blank" class="q-link">Ethereum Up or Down - July 6, 4PM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/xrp-updown-15m-1765152000" target="_blank" class="q-link">XRP Up or Down - December 7, 7:00PM-7:15PM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/nhl-wsh-lak-2025-12-02" target="_blank" class="q-link">Spread: Kings (-1.5)</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/dehl-ise-eis-2026-01-08" target="_blank" class="q-link">DEL: Iserlohn Roosters vs. Eisbaeren Berlin</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/sag-award-best-supporting-actress" target="_blank" class="q-link">Will Zoe Saldaña win Best Supporting Actress at the 2025 SAG Award for "Emilia P</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/atp-prizmic-heide-2026-01-14" target="_blank" class="q-link">Prizmic vs. Heide: Match O/U 21.5</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/wta-maria-william-2026-01-11" target="_blank" class="q-link">Maria vs. Williams: Total Sets O/U 2.5</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/atp-galan-grenier-2026-01-12" target="_blank" class="q-link">Set 1 Winner: Galan vs Grenier</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/cs2-furia-9ine-2026-01-16" target="_blank" class="q-link">Total Rounds Over/Under 43.5</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/how-many-new-us-residential-sales-will-the-u-s-census-bureau-report-for-june-1" target="_blank" class="q-link">How many new US residential sales will the U.S. Census Bureau report for June?</a></td>
+          <td><span class="cat">us-current-a</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>25¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/cbb-umbc-coppst-2025-12-29" target="_blank" class="q-link">Spread: UMBC Retrievers (-11.5)</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/epl-cry-new-2024-11-30" target="_blank" class="q-link">Will Crystal Palace vs. Newcastle end in a draw?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/xrp-updown-15m-1762349400" target="_blank" class="q-link">XRP Up or Down - November 5, 8:30AM-8:45AM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/solana-up-or-down-august-3-12am-et" target="_blank" class="q-link">Solana Up or Down - August 3, 12AM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/champions-league-league-phase-winner" target="_blank" class="q-link">Will Marseille finish first in UCL league phase?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/xrp-updown-15m-1768524300" target="_blank" class="q-link">XRP Up or Down - January 15, 7:45PM-8:00PM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/acn-egy-ben-2026-01-05-more-markets" target="_blank" class="q-link">Egypt vs. Benin: O/U 3.5</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/dota2-flc-liquid-2026-02-04" target="_blank" class="q-link">Total Kills Over/Under 50.5 in Game 1?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/dota2-flc-liquid-2026-02-04" target="_blank" class="q-link">Total Kills Over/Under 42.5 in Game 1?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/dota2-tundra-ty-2026-02-04" target="_blank" class="q-link">Total Kills Over/Under 56.5 in Game 1?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/dota2-flc-liquid-2026-02-04" target="_blank" class="q-link">Total Kills Over/Under 41.5 in Game 1?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/will-isaiah-bond-get-drafted" target="_blank" class="q-link">Will Isaiah Bond get drafted?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/cbb-txst-loulaf-2026-02-21" target="_blank" class="q-link">Spread: Texas State Bobcats (-3.5)</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/highest-temperature-in-wellington-on-february-5-2026" target="_blank" class="q-link">Will the highest temperature in Wellington be 15°C or below on February 5?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/xrp-up-or-down-july-20-4pm-et" target="_blank" class="q-link">XRP Up or Down - July 20, 4PM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/nfl-week-2-totals" target="_blank" class="q-link">Will there be 47 or more combined points scored?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/mad-realities-which-couple-will-win-proof-of-love" target="_blank" class="q-link">Will the mystery couple win "Proof of Love"?</a></td>
+          <td><span class="cat">nfts</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/nhl-will-the-lightning-beat-the-senators-by-more-than-1pt5-goals-in-their-december-16-matchup" target="_blank" class="q-link">NHL: Will the Lightning beat the Senators by more than 1.5 goals in their Decemb</a></td>
+          <td><span class="cat">sports</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/xrp-updown-15m-1769972400" target="_blank" class="q-link">XRP Up or Down - February 1, 2:00PM-2:15PM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/eth-updown-15m-1761152400" target="_blank" class="q-link">Ethereum Up or Down - October 22, 1:00PM-1:15PM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/dota2-perrej-sangre-2026-01-09" target="_blank" class="q-link">Dota 2: Perú Rejects vs Team Sangre - Game 2 Winner</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/xrp-updown-15m-1765291500" target="_blank" class="q-link">XRP Up or Down - December 9, 9:45AM-10:00AM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/xrp-updown-15m-1763577900" target="_blank" class="q-link">XRP Up or Down - November 19, 1:45PM-2:00PM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/nhl-buf-phi-2025-12-03" target="_blank" class="q-link">Spread: Sabres (-1.5)</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/meta-above-on-november-21-2025" target="_blank" class="q-link">Will Meta (META) finish week of November 17 above $550?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/highest-temperature-in-london-on-july-27" target="_blank" class="q-link">Will the highest temperature in London be 76°F or higher on July 27?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/btc-multistrike-4h-1757476800" target="_blank" class="q-link">Will the price of Bitcoin be above $113,000 on September 10 at 12AM ET?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/elc-der-lei-2025-12-06-more-markets" target="_blank" class="q-link">Derby County FC vs. Leicester City FC: O/U 2.5</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/cbb-nmx-nevada-2026-02-24" target="_blank" class="q-link">Spread: Nevada Wolf Pack (-1.5)</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/wta-cocciar-gorgodz-2026-02-06" target="_blank" class="q-link">Cocciaretto vs. Gorgodze: Set 1 Games O/U 9.5</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/nba-hou-atl-2026-01-29" target="_blank" class="q-link">Rockets vs. Hawks: 1H O/U 109.5</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/who-will-attend-the-state-of-the-union-address" target="_blank" class="q-link">Will John Fetterman attend the 2026 State of the Union address?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/atp-wawrink-hassan-2026-02-23" target="_blank" class="q-link">Set Handicap: Wawrinka (-1.5) vs Hassan (+1.5)</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/highest-temperature-in-nyc-on-october-7" target="_blank" class="q-link">Will the highest temperature in New York City be between 83-84°F on October 7?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/btc-up-or-down-15m-1758263400" target="_blank" class="q-link">Bitcoin Up or Down - September 19, 2:30AM-2:45AM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/xrp-up-or-down-september-22-5am-et" target="_blank" class="q-link">XRP Up or Down - September 22, 5AM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/lol-edg-nip-2026-01-19" target="_blank" class="q-link">Series: EDward Gaming Drake Handicap (-1.5) vs Ninjas in Pyjamas (+1.5)</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/miami-grand-prix-winner" target="_blank" class="q-link">Will Jack Doohan win the 2025 Miami Grand Prix?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict hit">✓</span></td>
+          <td class="dim">2026-02-27</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/cs2-ace1-bbp-2026-01-23" target="_blank" class="q-link">Counter-Strike: Acend vs Bebop (BO3) - CCT Europe Series #14 Play-In Group B</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/dota2-mouz-liquid-2026-02-26" target="_blank" class="q-link">Total Kills Over/Under 56.5 in Game 1?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/dota2-4p-pr1-2026-01-10" target="_blank" class="q-link">Series: Most kills?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/lol-ly-tl2-2026-02-27" target="_blank" class="q-link">Total Kills Over/Under 30.5 in Game 1?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/atp-lizunov-yoshida-2026-01-24" target="_blank" class="q-link">Set 1 Winner: Lizunova vs Yoshida</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/ucol-ucr-noa-2025-10-23" target="_blank" class="q-link">Will Universitatea Craiova CS win on 2025-10-23?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/sol-updown-15m-1769156100" target="_blank" class="q-link">Solana Up or Down - January 23, 3:15AM-3:30AM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/united-states-grand-prix-pole-winner" target="_blank" class="q-link">Will Gabriel Bortoleto win the 2025 F1 United States Grand Prix pole?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/what-will-biden-say-during-drop-out-speech" target="_blank" class="q-link">Will Biden say "Old" during drop out speech?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/what-nicknames-will-trump-say-by-february-28" target="_blank" class="q-link">Will Trump say “Sleazebag” by February 28?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/nba-por-sac-2025-12-20" target="_blank" class="q-link">Trail Blazers vs. Kings: O/U 239.5</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/eth-multistrike-4h-1757606400" target="_blank" class="q-link">Will the price of Ethereum be above $4,475 on September 11 at 12PM ET?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/snhl-klo-dav-2026-01-02" target="_blank" class="q-link">SNHL: Kloten Flyers vs. Davos</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/what-will-trump-say-first-during-saudi-pm-events-on-november-18" target="_blank" class="q-link">Will Trump say "Two Weeks" first during Saudi PM events on November 18?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/world-cup-matches" target="_blank" class="q-link">World Cup: Thursday - Will Brazil beat Serbia?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/solana-up-or-down-july-3-9pm-et" target="_blank" class="q-link">Solana Up or Down - July 3, 9PM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/italy-grand-prix-pole-winner" target="_blank" class="q-link">Will Esteban Ocon win the 2025 Italy GP pole?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/eth-updown-15m-1764097200" target="_blank" class="q-link">Ethereum Up or Down - November 25, 2:00PM-2:15PM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/highest-temperature-in-london-on-may-10" target="_blank" class="q-link">Will the highest temperature in London be between 66-67°F on May 10?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/btc-updown-4h-1761148800" target="_blank" class="q-link">Bitcoin Up or Down - October 22, 12:00PM-4:00PM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/winter-games-2026-luge-mens-doubles" target="_blank" class="q-link">Will Bosman/Mick (SVK) win the gold medal for Winter Olympics 2026: Luge - Men's</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/fl1-ogc-ang-2025-12-07-more-markets" target="_blank" class="q-link">Spread: OGC Nice (-1.5)</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/cs2-orm-ff-2025-12-18" target="_blank" class="q-link">Counter-Strike: Oramond vs Fire Flux Esports - Map 2 Winner</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/eth-updown-5m-1772205000" target="_blank" class="q-link">Ethereum Up or Down - February 27, 10:10AM-10:15AM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/xrp-updown-15m-1769845500" target="_blank" class="q-link">XRP Up or Down - January 31, 2:45AM-3:00AM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/cs2-bb3-fokus-2026-02-26" target="_blank" class="q-link">Counter-Strike: BetBoom Team vs FOKUS - Map 2 Winner</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/highest-temperature-in-buenos-aires-on-february-12-2026" target="_blank" class="q-link">Will the highest temperature in Buenos Aires be 30°C on February 12?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/elon-musk-of-tweets-september-7" target="_blank" class="q-link">Will Elon Musk post 40-49 tweets on September 7, 2025?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/who-will-win-super-bowl-lvii" target="_blank" class="q-link">Will the Jacksonville Jaguars win Super Bowl LVII?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/eurobasket-germany-vs-great-britain-2025-09-01" target="_blank" class="q-link">Euro Basket: Germany vs Great Britain</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/xrp-updown-15m-1768409100" target="_blank" class="q-link">XRP Up or Down - January 14, 11:45AM-12:00PM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/btc-multistrike-4h-1758153600" target="_blank" class="q-link">Will the price of Bitcoin be above $116,500 on September 17 at 8PM ET?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/xrp-updown-15m-1761886800" target="_blank" class="q-link">XRP Up or Down - October 31, 1:00AM-1:15AM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/xrp-updown-15m-1770969600" target="_blank" class="q-link">XRP Up or Down - February 13, 3:00AM-3:15AM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/cs2-am-ace1-2026-02-17" target="_blank" class="q-link">Counter-Strike: AM Gaming vs Acend (BO3) - CCT Europe Series #15 Playoffs</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/bun-uni-b04-2026-02-21-more-markets" target="_blank" class="q-link">1. FC Union Berlin vs. Bayer 04 Leverkusen: Both Teams to Score</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/ucl-slovan-bratislava-vs-dinamo-zagreb" target="_blank" class="q-link">Will Slovan Bratislava beat Dinamo Zagreb?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/what-will-trump-say-during-the-announcement-on-february-5" target="_blank" class="q-link">Will Trump say "Big" or "Biggest" or "Bigly" 10+ times during the announcement o</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/lol-vit-mkoi-2026-02-07" target="_blank" class="q-link">Total Kills Over/Under 33.5 in Game 1?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/ethereum-up-or-down-july-6-4pm-et" target="_blank" class="q-link">Ethereum Up or Down - July 6, 4PM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/xrp-updown-15m-1765152000" target="_blank" class="q-link">XRP Up or Down - December 7, 7:00PM-7:15PM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/nhl-wsh-lak-2025-12-02" target="_blank" class="q-link">Spread: Kings (-1.5)</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/dehl-ise-eis-2026-01-08" target="_blank" class="q-link">DEL: Iserlohn Roosters vs. Eisbaeren Berlin</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/sag-award-best-supporting-actress" target="_blank" class="q-link">Will Zoe Saldaña win Best Supporting Actress at the 2025 SAG Award for "Emilia P</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/wta-maria-william-2026-01-11" target="_blank" class="q-link">Maria vs. Williams: Total Sets O/U 2.5</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/atp-galan-grenier-2026-01-12" target="_blank" class="q-link">Set 1 Winner: Galan vs Grenier</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/atp-prizmic-heide-2026-01-14" target="_blank" class="q-link">Prizmic vs. Heide: Match O/U 21.5</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/cs2-furia-9ine-2026-01-16" target="_blank" class="q-link">Total Rounds Over/Under 43.5</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/how-many-new-us-residential-sales-will-the-u-s-census-bureau-report-for-june-1" target="_blank" class="q-link">How many new US residential sales will the U.S. Census Bureau report for June?</a></td>
+          <td><span class="cat">us-current-a</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>25¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/cbb-umbc-coppst-2025-12-29" target="_blank" class="q-link">Spread: UMBC Retrievers (-11.5)</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/epl-cry-new-2024-11-30" target="_blank" class="q-link">Will Crystal Palace vs. Newcastle end in a draw?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/xrp-updown-15m-1762349400" target="_blank" class="q-link">XRP Up or Down - November 5, 8:30AM-8:45AM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/solana-up-or-down-august-3-12am-et" target="_blank" class="q-link">Solana Up or Down - August 3, 12AM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/champions-league-league-phase-winner" target="_blank" class="q-link">Will Marseille finish first in UCL league phase?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/xrp-updown-15m-1768524300" target="_blank" class="q-link">XRP Up or Down - January 15, 7:45PM-8:00PM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/acn-egy-ben-2026-01-05-more-markets" target="_blank" class="q-link">Egypt vs. Benin: O/U 3.5</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/sol-updown-15m-1772218800" target="_blank" class="q-link">Solana Up or Down - February 27, 2:00PM-2:15PM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/dota2-flc-liquid-2026-02-04" target="_blank" class="q-link">Total Kills Over/Under 50.5 in Game 1?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/dota2-flc-liquid-2026-02-04" target="_blank" class="q-link">Total Kills Over/Under 42.5 in Game 1?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/dota2-flc-liquid-2026-02-04" target="_blank" class="q-link">Total Kills Over/Under 41.5 in Game 1?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/dota2-tundra-ty-2026-02-04" target="_blank" class="q-link">Total Kills Over/Under 56.5 in Game 1?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/will-isaiah-bond-get-drafted" target="_blank" class="q-link">Will Isaiah Bond get drafted?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/cbb-txst-loulaf-2026-02-21" target="_blank" class="q-link">Spread: Texas State Bobcats (-3.5)</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/highest-temperature-in-wellington-on-february-5-2026" target="_blank" class="q-link">Will the highest temperature in Wellington be 15°C or below on February 5?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/xrp-up-or-down-july-20-4pm-et" target="_blank" class="q-link">XRP Up or Down - July 20, 4PM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/nfl-week-2-totals" target="_blank" class="q-link">Will there be 47 or more combined points scored?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/mad-realities-which-couple-will-win-proof-of-love" target="_blank" class="q-link">Will the mystery couple win "Proof of Love"?</a></td>
+          <td><span class="cat">nfts</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/nhl-will-the-lightning-beat-the-senators-by-more-than-1pt5-goals-in-their-december-16-matchup" target="_blank" class="q-link">NHL: Will the Lightning beat the Senators by more than 1.5 goals in their Decemb</a></td>
+          <td><span class="cat">sports</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/xrp-updown-15m-1769972400" target="_blank" class="q-link">XRP Up or Down - February 1, 2:00PM-2:15PM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/eth-updown-15m-1761152400" target="_blank" class="q-link">Ethereum Up or Down - October 22, 1:00PM-1:15PM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/dota2-perrej-sangre-2026-01-09" target="_blank" class="q-link">Dota 2: Perú Rejects vs Team Sangre - Game 2 Winner</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/xrp-updown-15m-1765291500" target="_blank" class="q-link">XRP Up or Down - December 9, 9:45AM-10:00AM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/xrp-updown-15m-1763577900" target="_blank" class="q-link">XRP Up or Down - November 19, 1:45PM-2:00PM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/nhl-buf-phi-2025-12-03" target="_blank" class="q-link">Spread: Sabres (-1.5)</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/meta-above-on-november-21-2025" target="_blank" class="q-link">Will Meta (META) finish week of November 17 above $550?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/highest-temperature-in-london-on-july-27" target="_blank" class="q-link">Will the highest temperature in London be 76°F or higher on July 27?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/btc-multistrike-4h-1757476800" target="_blank" class="q-link">Will the price of Bitcoin be above $113,000 on September 10 at 12AM ET?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/elc-der-lei-2025-12-06-more-markets" target="_blank" class="q-link">Derby County FC vs. Leicester City FC: O/U 2.5</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/cbb-nmx-nevada-2026-02-24" target="_blank" class="q-link">Spread: Nevada Wolf Pack (-1.5)</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/wta-cocciar-gorgodz-2026-02-06" target="_blank" class="q-link">Cocciaretto vs. Gorgodze: Set 1 Games O/U 9.5</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/nba-hou-atl-2026-01-29" target="_blank" class="q-link">Rockets vs. Hawks: 1H O/U 109.5</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/who-will-attend-the-state-of-the-union-address" target="_blank" class="q-link">Will John Fetterman attend the 2026 State of the Union address?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/atp-wawrink-hassan-2026-02-23" target="_blank" class="q-link">Set Handicap: Wawrinka (-1.5) vs Hassan (+1.5)</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>100¢</td>
+          <td class="res-yes">YES</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/highest-temperature-in-nyc-on-october-7" target="_blank" class="q-link">Will the highest temperature in New York City be between 83-84°F on October 7?</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/btc-up-or-down-15m-1758263400" target="_blank" class="q-link">Bitcoin Up or Down - September 19, 2:30AM-2:45AM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+        <tr class="row-nono">
+          <td><span class="real-badge real">★</span></td>
+          <td><a href="https://polymarket.com/event/xrp-up-or-down-september-22-5am-et" target="_blank" class="q-link">XRP Up or Down - September 22, 5AM ET</a></td>
+          <td><span class="cat">unknown</span></td>
+          <td><strong class="prob-nono">0%</strong></td>
+          <td><span class="bucket-tag nono">NO_NO</span></td>
+          <td>0¢</td>
+          <td class="res-no">NO</td>
+          <td><span class="verdict miss">✗</span></td>
+          <td class="dim">2026-02-28</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div style="font-size:0.58rem;color:var(--dim);padding-bottom:3rem;line-height:1.8">
+    <strong style="color:var(--text)">Notas:</strong><br>
+    ★ = label real (mercado resuelto con outcome conocido) &nbsp;|&nbsp;
+    h = label heurístico (proxy basado en características del mercado)<br>
+    ✓ = predicción correcta &nbsp;|&nbsp; ✗ = predicción incorrecta &nbsp;|&nbsp; ~ = bucket 50/50 (inconclusivo)<br>
+    SEGURA correcta = predijo bueno y era bueno &nbsp;|&nbsp; NO NO correcta = predijo malo y era malo
+  </div>
+</main>
+
+<script>
+function filterTable(type, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const rows = document.querySelectorAll('#table-body tr');
+  rows.forEach(row => {
+    let show = true;
+    if (type === 'SEGURA')   show = row.classList.contains('row-segura');
+    if (type === 'CINCUENTA')show = row.classList.contains('row-cincuenta');
+    if (type === 'NO_NO')    show = row.classList.contains('row-nono');
+    if (type === 'HIT')      show = row.querySelector('.verdict.hit') !== null;
+    if (type === 'MISS')     show = row.querySelector('.verdict.miss') !== null;
+    if (type === 'REAL')     show = row.querySelector('.real-badge.real') !== null;
+    row.style.display = show ? '' : 'none';
+  });
+}
+</script>
+</body>
+</html>
